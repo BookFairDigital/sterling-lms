@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Activity, BookOpen, CircleDollarSign, GraduationCap, LayoutDashboard, LogOut, RefreshCw, Users, Video, Bell, UserPlus } from 'lucide-react'
 
-type Section = 'overview' | 'students' | 'courses' | 'enrollments' | 'payments' | 'zoom' | 'announcements'
+type Section = 'overview' | 'students' | 'courses' | 'enrollments' | 'materials' | 'payments' | 'zoom' | 'announcements'
 type DataRow = Record<string, string | number | null>
 const API = 'https://sterling-lms-api.texascampus1.workers.dev'
 const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
@@ -9,6 +9,7 @@ const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] =
   { id: 'students', label: 'Students', icon: Users },
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'enrollments', label: 'Enrollments', icon: UserPlus },
+  { id: 'materials', label: 'Learning Materials', icon: BookOpen },
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
   { id: 'zoom', label: 'Zoom Classes', icon: Video },
   { id: 'announcements', label: 'Announcements', icon: Bell },
@@ -30,6 +31,10 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const [enrollmentCourses, setEnrollmentCourses] = useState<DataRow[]>([])
   const [enrollmentForm, setEnrollmentForm] = useState({ student_id: '', course_id: '', status: 'active' })
   const [savingEnrollment, setSavingEnrollment] = useState(false)
+  const [materialCourses, setMaterialCourses] = useState<DataRow[]>([])
+  const [materialForm, setMaterialForm] = useState({course_id:'',title:''})
+  const [materialFile, setMaterialFile] = useState<File | null>(null)
+  const [savingMaterial, setSavingMaterial] = useState(false)
   const title = sections.find(x => x.id === section)?.label || 'Overview'
   const load = useCallback(async (target: Section = section) => {
     setLoading(true); setError('')
@@ -44,17 +49,19 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
     finally { setLoading(false) }
   }, [section])
   useEffect(() => { void load(section) }, [section, load])
+  useEffect(() => { if (section === 'materials') { fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setMaterialCourses(Array.isArray(d)?d:[])).catch(()=>setError('Could not load courses for materials')) } }, [section])
   useEffect(() => { if (section === 'enrollments') { Promise.all([fetch(API+'/api/students',{credentials:'include'}).then(r=>r.json()),fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json())]).then(([students,courses])=>{setEnrollmentStudents(Array.isArray(students)?students:[]);setEnrollmentCourses(Array.isArray(courses)?courses:[])}).catch(()=>setError('Could not load students and courses for enrolment')) } }, [section])
   const pretty = (value: unknown) => value === null || value === undefined || value === '' ? '—' : String(value)
   const columns: Record<Exclude<Section, 'overview'>, string[]> = {
     enrollments: ['student_number', 'student_name', 'course_code', 'course_title', 'status', 'created_at'],
+    materials: ['title','course_title','file_type','file_size','created_at'],
     students: ['student_number', 'full_name', 'email', 'phone', 'status'],
     courses: ['course_code', 'title', 'fee_amount', 'currency', 'status'],
     payments: ['id', 'student_name', 'course_title', 'amount', 'currency', 'status'],
     zoom: ['title', 'course_title', 'starts_at', 'duration_minutes', 'meeting_url'],
     announcements: ['title', 'audience', 'published_at', 'created_at'],
   }
-  const labels: Record<string, string> = { student_number: 'Student ID', student_name: 'Student', course_title: 'Course', course_code: 'Course Code', full_name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', course_code: 'Code', title: 'Title', fee_amount: 'Fee', currency: 'Currency', id: 'Payment ID', student_name: 'Student', course_title: 'Course', amount: 'Amount', starts_at: 'Starts', duration_minutes: 'Duration (min)', meeting_url: 'Meeting link', audience: 'Audience', published_at: 'Published', created_at: 'Created' }
+  const labels: Record<string, string> = { student_number: 'Student ID', student_name: 'Student', course_title: 'Course', course_code: 'Course Code', file_type:'File type', file_size:'Size (bytes)', full_name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', course_code: 'Code', title: 'Title', fee_amount: 'Fee', currency: 'Currency', id: 'Payment ID', student_name: 'Student', course_title: 'Course', amount: 'Amount', starts_at: 'Starts', duration_minutes: 'Duration (min)', meeting_url: 'Meeting link', audience: 'Audience', published_at: 'Published', created_at: 'Created' }
   return <div className="min-h-screen bg-[#f3f6fb] text-slate-900">
     <aside className="fixed inset-y-0 left-0 hidden w-[245px] flex-col bg-[#102b46] text-white lg:flex"><div className="flex h-20 items-center gap-3 border-b border-white/10 px-5"><div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-600"><GraduationCap size={23}/></div><div><b>STERLING</b><p className="text-[9px] tracking-[.2em] text-blue-200">ADMINISTRATION</p></div></div><nav className="flex-1 space-y-1 p-3">{sections.map(item => <button key={item.id} onClick={() => setSection(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[13px] ${section === item.id ? 'bg-blue-600' : 'text-blue-100 hover:bg-white/10'}`}><item.icon size={17}/>{item.label}</button>)}</nav><button onClick={onExit} className="flex items-center gap-3 border-t border-white/10 p-5 text-sm text-blue-100"><LogOut size={16}/>Sign out</button></aside>
     <main className="min-h-screen lg:ml-[245px]"><header className="flex h-[68px] items-center justify-between border-b bg-white px-4 sm:px-6"><b className="text-sm">Sterling LMS · Admin</b><button onClick={() => void load(section)} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50"><RefreshCw size={14} className={loading ? 'animate-spin' : ''}/>Refresh</button></header>
@@ -63,6 +70,13 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
       {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       {section === 'overview' ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[{label:'Total Students',key:'students',icon:Users},{label:'Published Courses',key:'courses',icon:BookOpen},{label:'Pending Payments',key:'pending_payments',icon:CircleDollarSign},{label:'Upcoming Classes',key:'upcoming_classes',icon:Video}].map(k => {const Icon=k.icon;return <section key={k.key} className="rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between text-xs font-semibold text-slate-500">{k.label}<Icon size={19}/></div><p className="mt-4 text-3xl font-extrabold">{dashboard ? pretty(dashboard[k.key]) : '—'}</p></section>})}<section className="rounded-xl border bg-white p-5 text-sm text-slate-600 sm:col-span-2 xl:col-span-4"><Activity className="mb-2 text-blue-600"/>Live summary. Counts reflect actual records currently stored in the database; no sample records are inserted.</section></div> :
       <section className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        {section === 'materials' && <div className="border-b p-4"><span className="text-xs text-slate-500">Upload learning resources to secure storage (maximum 20 MB per file)</span></div>}
+        {section === 'materials' && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e=>{e.preventDefault();if(!materialFile)return;setSavingMaterial(true);setError('');setNotice('');try{const fd=new FormData();fd.append('course_id',materialForm.course_id);fd.append('title',materialForm.title);fd.append('file',materialFile);const r=await fetch(API+'/api/materials',{method:'POST',credentials:'include',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Upload failed');setNotice('Material uploaded successfully.');setMaterialForm({course_id:'',title:''});setMaterialFile(null);await load('materials')}catch(e){setError(e instanceof Error?e.message:'Upload failed')}finally{setSavingMaterial(false)}}}>
+          <label className="text-xs font-semibold text-slate-600">Course<select required value={materialForm.course_id} onChange={e=>setMaterialForm(v=>({...v,course_id:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"><option value="">Select course</option>{materialCourses.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.course_code||'')} · {String(c.title||'')}</option>)}</select></label>
+          <label className="text-xs font-semibold text-slate-600">Material title<input required value={materialForm.title} onChange={e=>setMaterialForm(v=>({...v,title:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
+          <label className="text-xs font-semibold text-slate-600 sm:col-span-2">File (PDF, JPG, PNG, MP4, DOCX; max 20 MB)<input required type="file" accept=".pdf,.jpg,.jpeg,.png,.mp4,.docx" onChange={e=>setMaterialFile(e.target.files?.[0]||null)} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm"/></label>
+          <div><button disabled={savingMaterial||!materialFile||materialCourses.length===0} className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white disabled:opacity-50">{savingMaterial?'Uploading…':'Upload Material'}</button></div>
+        </form>}
         {section === 'enrollments' && <div className="flex items-center justify-between border-b p-4"><span className="text-xs text-slate-500">Assign students to published courses</span><span className="text-xs font-semibold text-slate-500">{rows.length} enrolments</span></div>}
         {section === 'enrollments' && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e => { e.preventDefault(); setSavingEnrollment(true); setError(''); setNotice(''); try { const r=await fetch(API+'/api/enrollments',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(enrollmentForm)}); const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Could not enrol student'); setNotice('Student enrolled successfully.'); setEnrollmentForm({student_id:'',course_id:'',status:'active'}); await load('enrollments') } catch(e) { setError(e instanceof Error ? e.message : 'Could not enrol student') } finally { setSavingEnrollment(false) } }}>
           <label className="text-xs font-semibold text-slate-600">Student<select required value={enrollmentForm.student_id} onChange={e=>setEnrollmentForm(v=>({...v,student_id:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"><option value="">Select a student</option>{enrollmentStudents.map(x=><option key={String(x.id)} value={String(x.id)}>{String(x.student_number||'')} · {String(x.full_name||'')}</option>)}</select></label>
