@@ -67,7 +67,7 @@ export default {async fetch(req,env){
   if(u.role!=="admin")return json({error:"Admin access required"},403,h);
   const b=await getBody(req),studentNumber=String(b?.student_number||"").trim(),name=String(b?.full_name||"").trim(),email=String(b?.email||"").trim().toLowerCase(),phone=String(b?.phone||"").trim(),password=String(b?.password||"");
   if(!studentNumber||!name||!email||password.length<12)return json({error:"Student ID, full name, email and a password of at least 12 characters are required"},400,h);
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return json({error:"Enter a valid email address"},400,h);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return json({error:"Enter a valid email address"},400,h);
   const salt=hex(random(16).buffer),digest=await pwHash(password,salt);
   try{
    await env.DB.prepare("INSERT INTO users(id,student_number,full_name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?,'student','active')").bind(crypto.randomUUID(),studentNumber,name,email,phone||null,salt+":"+digest).run();
