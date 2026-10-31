@@ -3,7 +3,7 @@ import {
   Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
   CreditCard, FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
   MessageSquare, PlayCircle, Search, Settings, Users, Video, Wallet, X,
-  ChevronRight, Download, Upload, Clock3, BookMarked,
+  ChevronRight, Download, BookMarked,
 } from 'lucide-react'
 
 const nav = [
