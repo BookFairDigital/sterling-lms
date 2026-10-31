@@ -74,6 +74,20 @@ export default {async fetch(req,env){
   if(!code||!title||!Number.isFinite(fee)||fee<0||!["draft","published"].includes(status))return json({error:"Course code, title, valid fee and status are required"},400,h);
   try{const id=crypto.randomUUID();await env.DB.prepare("INSERT INTO courses(id,title,course_code,description,fee_amount,currency,status) VALUES(?,?,?,?,?,?,?)").bind(id,title,code,description||null,fee,currency,status).run();return json({ok:true,course:{id,course_code:code,title,fee_amount:fee,currency,status}},201,h);}catch(e){if(String(e?.message||e).toLowerCase().includes("unique"))return json({error:"That course code is already in use"},409,h);throw e;}
  }
+ if(path==="/api/enrollments"&&req.method==="GET"){
+  if(u.role!=="admin"&&u.role!=="lecturer")return json({error:"Access denied"},403,h);
+  const rows=await env.DB.prepare("SELECT e.id,e.status,e.created_at,s.student_number,s.full_name AS student_name,c.course_code,c.title AS course_title FROM enrollments e JOIN users s ON s.id=e.student_id JOIN courses c ON c.id=e.course_id ORDER BY e.created_at DESC").all();
+  return json(rows.results||[],200,h);
+ }
+ if(path==="/api/enrollments"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),studentId=String(b?.student_id||""),courseId=String(b?.course_id||""),status=String(b?.status||"active");
+  if(!studentId||!courseId||!["pending","active"].includes(status))return json({error:"Select a student and course"},400,h);
+  const student=await env.DB.prepare("SELECT id FROM users WHERE id=? AND role='student' AND status='active'").bind(studentId).first();
+  const course=await env.DB.prepare("SELECT id FROM courses WHERE id=? AND status='published'").bind(courseId).first();
+  if(!student||!course)return json({error:"Choose an active student and a published course"},400,h);
+  try{const id=crypto.randomUUID();await env.DB.prepare("INSERT INTO enrollments(id,student_id,course_id,status) VALUES(?,?,?,?)").bind(id,studentId,courseId,status).run();return json({ok:true,id},201,h);}catch(e){if(String(e?.message||e).toLowerCase().includes("unique"))return json({error:"This student is already enrolled in that course"},409,h);throw e;}
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
