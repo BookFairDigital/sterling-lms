@@ -130,7 +130,7 @@ function App() {
       reports:[['Course Progress','45% completed'],['Attendance','92% this month'],['Assignments','8 of 11 submitted']],
       settings:[['Student Name','Edit your profile details'],['Email Address','Update your contact email'],['Password','Change your account password']],
     }
-    return <Card>{(rows[page] ?? []).map(([name,detail])=><div key={name} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"><div><b className="block text-sm">{name}</b><span className="text-xs text-slate-500">{detail}</span></div>{page==='materials'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white"><Download size={13} className="mr-1 inline"/>Open</button>:page==='classes'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Join Class</button>:page==='assessments'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Start</button>:null}</div>)}</Card>
+    return <Card>{(rows[page] ?? []).map(([name,detail])=><div key={name} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"><div><b className="block text-sm">{name}</b><span className="text-xs text-slate-500">{detail}</span></div>{page==='assessments'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Start</button>:null}</div>)}</Card>
   }
 
   if (loggedIn && userRole === 'admin') return <AdminPanel onExit={async () => { await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout', { method: 'POST', credentials: 'include' }); setLoggedIn(false); setUserRole('') }} />
