@@ -56,7 +56,7 @@ export default {async fetch(req,env){
  }
  if(path==="/auth/me"&&req.method==="GET"){const u=await userFor(req,env);return u?json({user:u},200,h):json({error:"Sign in required"},401,h);}
  if(path==="/auth/logout"&&req.method==="POST"){const t=req.headers.get("Cookie")?.match(/(?:^|; )sterling_session=([^;]+)/)?.[1];if(t)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await hash(t)).run();return json({ok:true},200,{...h,"set-cookie":cookie("",0)});}
- const u=await userFor(req,env);if(!u)return json({error:"Sign in required"},401,h);if(!["admin","lecturer"].includes(u.role))return json({error:"Forbidden"},403,h);
+ const u=await userFor(req,env);if(!u)return json({error:"Sign in required"},401,h);if(u.role==="student"&&path==="/api/student/announcements"&&req.method==="GET"){const rows=await env.DB.prepare("SELECT id,title,body,audience,published_at FROM announcements WHERE audience IN ('all','students') AND published_at<=CURRENT_TIMESTAMP ORDER BY published_at DESC").all();return json(rows.results||[],200,h);}if(!["admin","lecturer"].includes(u.role))return json({error:"Forbidden"},403,h);
  if(path==="/api/students"&&req.method==="POST"){
   if(u.role!=="admin")return json({error:"Admin access required"},403,h);
   const b=await getBody(req),studentNumber=String(b?.student_number||"").trim(),name=String(b?.full_name||"").trim(),email=String(b?.email||"").trim().toLowerCase(),phone=String(b?.phone||"").trim(),password=String(b?.password||"");
