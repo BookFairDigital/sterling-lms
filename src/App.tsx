@@ -1,97 +1,139 @@
-import {
-  Activity, ArrowRight, Bell, BookOpen, CalendarDays, CheckCircle2,
-  ChevronDown, ClipboardList, Clock3, CreditCard, FileText, GraduationCap,
-  LayoutDashboard, LogOut, Menu, MessageSquare, Play, Search, Settings,
-  Users, Video, Wallet, X, MapPin, Landmark, Download, Upload, Check,
-} from 'lucide-react'
 import { useState } from 'react'
+import {
+  Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
+  CreditCard, FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
+  MessageSquare, PlayCircle, Search, Settings, Users, Video, Wallet, X,
+  ChevronRight, Download, Upload, Clock3, BookMarked,
+} from 'lucide-react'
 
 const nav = [
-  ['Dashboard', LayoutDashboard], ['My Courses', BookOpen], ['Learning Materials', BookOpen],
-  ['Assignments', ClipboardList], ['Attendance', CalendarDays], ['Assessments', FileText],
-  ['Payments', Wallet], ['Zoom Classes', Video], ['Messages', MessageSquare],
-  ['Announcements', Bell], ['Lecturers', Users], ['Reports', Activity], ['Settings', Settings],
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'courses', label: 'My Courses', icon: BookOpen },
+  { id: 'materials', label: 'Learning Materials', icon: BookMarked },
+  { id: 'assignments', label: 'Assignments', icon: ClipboardList },
+  { id: 'attendance', label: 'Attendance', icon: CalendarDays },
+  { id: 'assessments', label: 'Assessments', icon: FileText },
+  { id: 'payments', label: 'Payments', icon: Wallet },
+  { id: 'classes', label: 'Zoom Classes', icon: Video },
+  { id: 'messages', label: 'Messages', icon: MessageSquare },
+  { id: 'announcements', label: 'Announcements', icon: Bell },
+  { id: 'lecturers', label: 'Lecturers', icon: Users },
+  { id: 'reports', label: 'Reports', icon: Activity },
+  { id: 'settings', label: 'Profile Settings', icon: Settings },
 ] as const
 
-const classes = [
-  { day: '15', month: 'JAN', title: 'Engine Management Systems', time: '09:00 AM – 11:00 AM', place: 'Online - Zoom', icon: Video },
-  { day: '17', month: 'JAN', title: 'Automotive Electrical Basics', time: '01:00 PM – 03:00 PM', place: 'Main Campus - Classroom 2', icon: MapPin },
-  { day: '19', month: 'JAN', title: 'Practical Workshop', time: '09:00 AM – 12:00 PM', place: 'Workshop - Kadawatha', icon: Users },
-]
+type Page = typeof nav[number]['id']
+
 const assignments = [
-  { title: 'Assignment 01', detail: 'Introduction to Automotive Systems', due: '12 Jan 2025', status: 'Pending' },
-  { title: 'Assignment 02', detail: 'Engine Components', due: '19 Jan 2025', status: 'Submitted' },
-  { title: 'Assignment 03', detail: 'Electrical Systems', due: '26 Jan 2025', status: 'Pending' },
-  { title: 'Assignment 04', detail: 'Diagnostic & Repair', due: '05 Feb 2025', status: 'Not Started' },
+  { title: 'Introduction to Automotive Systems', due: '12 Jan 2026', status: 'Pending' },
+  { title: 'Engine Components', due: '19 Jan 2026', status: 'Submitted' },
+  { title: 'Electrical Systems', due: '26 Jan 2026', status: 'Pending' },
+  { title: 'Diagnostic & Repair', due: '05 Feb 2026', status: 'Not Started' },
 ]
 
 function App() {
-  const [active, setActive] = useState('Dashboard')
-  const [mobileNav, setMobileNav] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [studentId, setStudentId] = useState('')
+  const [password, setPassword] = useState('')
+  const [remember, setRemember] = useState(true)
+  const [error, setError] = useState('')
+  const [page, setPage] = useState<Page>('dashboard')
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [completed, setCompleted] = useState(false)
 
-  return (
-    <div className="min-h-screen bg-[#f3f6fb] text-slate-900">
-      {mobileNav && <button aria-label="Close menu" onClick={() => setMobileNav(false)} className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden" />}
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-[210px] flex-col bg-[#082544] text-white shadow-xl transition-transform lg:translate-x-0 ${mobileNav ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex h-20 items-center gap-3 border-b border-white/10 px-5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border-[3px] border-white"><GraduationCap size={23}/></div>
-          <div className="leading-tight"><div className="text-lg font-black tracking-wide">STERLING</div><div className="text-[9px] font-semibold tracking-[.18em] text-blue-200">TRAINING CENTRE</div></div>
-          <button onClick={() => setMobileNav(false)} className="ml-auto lg:hidden"><X size={18}/></button>
+  const signIn = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!studentId.trim() || !password.trim()) {
+      setError('Please enter your student ID/email and password.')
+      return
+    }
+    setError('')
+    setLoggedIn(true)
+  }
+
+  const title = nav.find(item => item.id === page)?.label ?? 'Dashboard'
+  const go = (id: Page) => { setPage(id); setMobileOpen(false) }
+
+  const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) =>
+    <section className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 ${className}`}>{children}</section>
+
+  const SectionTitle = ({ children, action }: { children: React.ReactNode; action?: () => void }) =>
+    <div className="mb-4 flex items-center justify-between"><h2 className="font-bold text-slate-900">{children}</h2>{action && <button onClick={action} className="text-xs font-bold text-blue-600">View all</button>}</div>
+
+  const Status = ({ value }: { value: string }) => <span className={`rounded-md px-2 py-1 text-[10px] font-bold ${value === 'Submitted' || value === 'Present' ? 'bg-emerald-50 text-emerald-700' : value === 'Pending' ? 'bg-orange-50 text-orange-700' : 'bg-slate-100 text-slate-600'}`}>{value}</span>
+
+  const Dashboard = () => <div className="space-y-4">
+    <div className="grid gap-4 xl:grid-cols-[minmax(280px,.9fr)_minmax(0,1.6fr)]">
+      <div className="relative flex min-h-[330px] flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 text-white">
+        <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1100&q=85" alt="Automotive workshop" className="absolute inset-0 h-full w-full object-cover opacity-55"/>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#061b33] via-[#061b33]/65 to-transparent"/>
+        <div className="relative"><p className="text-[11px] font-bold uppercase tracking-[.18em] text-blue-200">TVEC approved training centre</p><h2 className="mt-3 text-3xl font-extrabold leading-tight">Build Your Future in the Automotive Industry</h2><p className="mt-3 text-sm text-blue-50">NVQ Level 4 courses · Practical training · Experienced instructors</p><ul className="mt-4 space-y-2 text-sm">{['Automobile Electrical Technician','Automobile Technician','Industry training','Modern facilities'].map(x=><li key={x} className="flex items-center gap-2"><CheckCircle2 size={16} className="text-emerald-400"/>{x}</li>)}</ul><button onClick={()=>go('courses')} className="mt-5 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold hover:bg-blue-700">Explore Courses</button></div>
+      </div>
+      <Card>
+        <h1 className="text-xl font-extrabold sm:text-2xl">Welcome Back, {studentId.includes('@') ? studentId.split('@')[0] : studentId}! 👋</h1><p className="mt-1 text-xs text-slate-500">Keep learning, keep growing.</p>
+        <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {[['My Courses','02','Active courses','bg-blue-50 text-blue-700',BookOpen],['Attendance','92%','This month','bg-emerald-50 text-emerald-700',CalendarDays],['Assignments','03','Due this week','bg-orange-50 text-orange-700',FileText],['Fee Status','LKR 50,000','Outstanding','bg-violet-50 text-violet-700',CreditCard]].map(([label,value,sub,tone,Icon])=><div key={String(label)} className={`rounded-xl p-3 ${tone}`}><div className="flex items-center justify-between text-xs font-semibold"><span>{label}</span><Icon size={18}/></div><p className="mt-2 text-xl font-extrabold">{value}</p><p className="mt-1 text-[10px] opacity-80">{sub}</p></div>)}
         </div>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
-          {nav.map(([label, Icon]) => <button key={label} onClick={() => {setActive(label);setMobileNav(false)}} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium transition ${active===label?'bg-blue-500 text-white shadow-lg shadow-blue-950/30':'text-blue-50/90 hover:bg-white/10'}`}><Icon size={17}/>{label}</button>)}
-        </nav>
-        <div className="border-t border-white/10 p-4"><div className="flex items-center gap-2 text-xs text-blue-100"><Settings size={15}/> Account settings</div><div className="mt-3 flex items-center gap-2 text-xs text-blue-200"><LogOut size={15}/> Sign out</div></div>
-      </aside>
-
-      <main className="min-h-screen lg:ml-[210px]">
-        <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur sm:px-6">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <button onClick={() => setMobileNav(true)} className="rounded-lg p-2 text-slate-600 lg:hidden"><Menu size={20}/></button>
-            <div className="relative w-full max-w-[465px]"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search courses, materials, or announcements..." className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-xs outline-none focus:border-blue-400"/></div>
-          </div>
-          <div className="ml-4 flex items-center gap-4"><button className="relative text-slate-500"><Bell size={19}/><span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500"/></button><div className="hidden items-center gap-2 sm:flex"><div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-700">NP</div><div className="text-right"><p className="text-xs font-bold">Student Portal</p><p className="text-[10px] text-slate-500">Student account</p></div><ChevronDown size={14}/></div></div>
-        </header>
-
-        <div className="w-full max-w-none p-3 sm:p-5 xl:p-6">
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(300px,.9fr)_minmax(0,1.6fr)]">
-            <section className="relative flex min-h-[350px] flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 text-white shadow-sm sm:min-h-[390px]">
-              <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1100&q=85" alt="Automotive technician working on a vehicle" className="absolute inset-0 h-full w-full object-cover opacity-60"/>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061b33] via-[#061b33]/65 to-[#061b33]/10"/>
-              <div className="relative max-w-xl"><p className="mb-2 text-xs font-semibold uppercase tracking-[.18em] text-blue-200">TVEC approved training centre</p><h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Build Your Future in the Automotive Industry</h2><p className="mt-3 text-sm text-blue-50">NVQ Level 4 courses · Practical training · Experienced instructors</p><ul className="mt-5 space-y-2 text-sm">{['Automobile Electrical Technician','Automobile Technician','Industry training','Modern facilities'].map(x=><li key={x} className="flex items-center gap-2"><CheckCircle2 size={17} className="text-emerald-400"/>{x}</li>)}</ul><button onClick={()=>setActive('My Courses')} className="mt-5 rounded-lg bg-blue-500 px-5 py-3 text-sm font-bold shadow-lg hover:bg-blue-600">View our courses</button></div>
-            </section>
-
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-              <div className="mb-4"><h1 className="text-xl font-extrabold sm:text-2xl">Welcome back! <span>👋</span></h1><p className="text-xs text-slate-500">Keep learning, keep growing.</p></div>
-              <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-                {[{label:'My Courses',value:'02',sub:'Active courses',icon:BookOpen,tone:'blue'},{label:'Attendance',value:'92%',sub:'This month',icon:CalendarDays,tone:'green'},{label:'Pending Assignments',value:'03',sub:'Due this week',icon:FileText,tone:'orange'},{label:'Fee Status',value:'LKR 50,000',sub:'Outstanding',icon:CreditCard,tone:'purple'}].map(s=><div key={s.label} className={`rounded-xl p-4 ${s.tone==='blue'?'bg-blue-50 text-blue-700':s.tone==='green'?'bg-emerald-50 text-emerald-700':s.tone==='orange'?'bg-orange-50 text-orange-700':'bg-violet-50 text-violet-700'}`}><div className="flex items-center justify-between gap-1"><p className="text-xs font-semibold">{s.label}</p><s.icon size={19}/></div><p className="mt-2 text-2xl font-extrabold">{s.value}</p><p className="mt-1 text-[11px] opacity-80">{s.sub}</p></div>)}
-              </div>
-              <div className="mt-4 grid gap-4 xl:grid-cols-2">
-                <div className="rounded-xl border border-slate-200 p-4"><div className="flex items-center justify-between"><h3 className="text-sm font-bold">My current course</h3><button onClick={()=>setActive('My Courses')} className="text-xs font-bold text-blue-600">View all</button></div><div className="mt-4 flex gap-3"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=300&q=80" alt="Automotive course" className="h-24 w-28 rounded-lg object-cover"/><div className="min-w-0 flex-1"><p className="text-sm font-bold">Certificate Course for Automobile Technician</p><p className="mt-1 text-xs text-slate-500">NVQ Level 4</p><div className="mt-3 h-2 rounded-full bg-slate-100"><div className="h-2 w-[45%] rounded-full bg-blue-500"/></div><p className="mt-1 text-right text-[10px] text-slate-500">45% complete</p></div></div><div className="mt-3 space-y-1 text-[11px] text-slate-500"><p className="flex gap-2"><CalendarDays size={13}/> Intake: January · Year 1</p><p className="flex gap-2"><BookOpen size={13}/> On-the-job training: Year 2</p></div></div>
-                <div className="rounded-xl border border-slate-200 p-4"><div className="flex items-center justify-between"><h3 className="text-sm font-bold">Upcoming classes</h3><button onClick={()=>setActive('Attendance')} className="text-xs font-bold text-blue-600">View all</button></div><div className="mt-3 space-y-2">{classes.map(c=><div key={c.day} className="flex items-center gap-3 border-b border-slate-100 pb-2 last:border-0"><div className="w-11 shrink-0 rounded-lg bg-slate-100 py-1 text-center"><p className="text-sm font-bold">{c.day}</p><p className="text-[9px] font-bold text-slate-500">{c.month}</p></div><div className="min-w-0 flex-1"><p className="truncate text-xs font-bold">{c.title}</p><p className="mt-1 text-[10px] text-slate-500">{c.time}</p></div><c.icon size={15} className="shrink-0 text-blue-600"/></div>)}</div></div>
-              </div>
-            </section>
-          </div>
-
-          <div className="mt-4 grid gap-4 xl:grid-cols-3">
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between"><h3 className="font-bold">Continue learning</h3><button onClick={()=>setActive('Learning Materials')} className="text-xs font-bold text-blue-600">View all</button></div><div className="relative mt-3 overflow-hidden rounded-lg"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80" alt="Automotive learning video" className="h-36 w-full object-cover"/><button aria-label="Play lesson" className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-blue-600 shadow"><Play size={21} fill="currentColor"/></button><span className="absolute bottom-2 right-3 text-xs font-semibold text-white">12:45</span></div><h4 className="mt-3 text-sm font-bold">1.1 Overview of Automotive Systems</h4><p className="mt-1 text-xs leading-5 text-slate-500">This lesson covers the basic overview of modern automotive systems and their functions.</p><div className="mt-3 flex gap-2"><button onClick={()=>setCompleted(!completed)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2.5 text-xs font-bold text-white">{completed?<Check size={14}/>:<CheckCircle2 size={14}/>} {completed?'Completed':'Mark as complete'}</button><button className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2.5 text-xs font-semibold"><Download size={14}/> PDF</button></div></section>
-
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between"><h3 className="font-bold">Recent assignments</h3><button onClick={()=>setActive('Assignments')} className="text-xs font-bold text-blue-600">View all</button></div><div className="mt-3 space-y-2">{assignments.map(a=><div key={a.title} className="flex items-center gap-2 rounded-lg border border-slate-100 p-2.5"><div className="rounded-lg bg-blue-50 p-2 text-blue-600"><FileText size={17}/></div><div className="min-w-0 flex-1"><p className="text-xs font-bold">{a.title}</p><p className="truncate text-[10px] text-slate-500">{a.detail}</p><p className="text-[10px] text-slate-400">Due: {a.due}</p></div><span className={`rounded-md px-2 py-1 text-[9px] font-bold ${a.status==='Submitted'?'bg-emerald-50 text-emerald-700':a.status==='Pending'?'bg-orange-50 text-orange-700':'bg-slate-100 text-slate-600'}`}>{a.status}</span></div>)}</div></section>
-
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between"><h3 className="font-bold">Course fee payments</h3><span className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700">LKR 50,000 due</span></div><p className="mt-2 text-xs text-slate-500">Check your fee status and manage payments.</p><div className="mt-4 space-y-2 border-y border-slate-100 py-3 text-xs"><div className="flex justify-between"><span className="text-slate-500">Total course fee</span><b>LKR 300,000</b></div><div className="flex justify-between"><span className="text-slate-500">Amount paid</span><b className="text-emerald-600">LKR 250,000</b></div><div className="flex justify-between"><b>Outstanding amount</b><b className="text-red-600">LKR 50,000</b></div></div><p className="mt-3 text-sm font-bold">Payment options</p><div className="mt-2 grid grid-cols-3 gap-2">{[{label:'Online',icon:CreditCard},{label:'Bank slip',icon:Landmark},{label:'History',icon:FileText}].map(p=><button key={p.label} onClick={()=>setActive('Payments')} className="flex flex-col items-center gap-2 rounded-lg border border-slate-200 p-3 text-center text-[10px] font-semibold hover:border-blue-300"><p.icon size={20} className="text-blue-600"/>{p.label}</button>)}</div></section>
-          </div>
-
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_.8fr]">
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><div className="flex items-center justify-between"><h3 className="font-bold">Recent announcements</h3><button onClick={()=>setActive('Announcements')} className="text-xs font-bold text-blue-600">View all</button></div><div className="mt-3 flex items-start gap-3 rounded-lg bg-blue-50 p-3"><div className="rounded-lg bg-white p-2 text-blue-600"><Bell size={18}/></div><div><p className="text-xs font-bold">Welcome to your Sterling learning portal</p><p className="mt-1 text-[11px] text-slate-600">Your courses, learning materials, assignments and payments will be available here.</p></div></div></section>
-            <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><h3 className="font-bold">Quick links</h3><div className="mt-3 grid grid-cols-2 gap-2">{[{label:'My courses',icon:BookOpen},{label:'Class schedule',icon:CalendarDays},{label:'Materials',icon:FileText},{label:'Zoom classes',icon:Video}].map(q=><button key={q.label} onClick={()=>setActive(q.label)} className="flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-left text-xs font-semibold hover:bg-blue-50"><q.icon size={18} className="text-blue-600"/>{q.label}<ArrowRight size={13} className="ml-auto"/></button>)}</div></section>
-          </div>
-          <footer className="py-6 text-center text-[11px] text-slate-400">© 2026 Sterling Training Centre · Learning Management System</footer>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-lg border border-slate-200 p-3"><SectionTitle action={()=>go('courses')}>My Current Course</SectionTitle><div className="flex gap-3"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=300&q=80" className="h-20 w-24 rounded-lg object-cover" alt="Automotive course"/><div className="min-w-0"><b className="text-xs">Certificate Course for Automobile Technician</b><p className="mt-1 text-xs text-slate-500">NVQ Level 4</p><div className="mt-3 h-2 rounded-full bg-slate-100"><div className="h-2 w-[45%] rounded-full bg-blue-600"/></div><p className="mt-1 text-right text-[10px] text-slate-500">45% Complete</p></div></div></div>
+          <div className="rounded-lg border border-slate-200 p-3"><SectionTitle action={()=>go('classes')}>Upcoming Classes</SectionTitle>{[['15 JAN','Engine Management Systems','09:00 AM – 11:00 AM'],['17 JAN','Automotive Electrical Basics','01:00 PM – 03:00 PM'],['19 JAN','Practical Workshop','09:00 AM – 12:00 PM']].map(c=><div key={c[0]} className="flex items-center gap-3 border-b border-slate-100 py-2 last:border-0"><div className="rounded bg-slate-100 px-2 py-1 text-center text-xs font-bold">{c[0]}</div><div><b className="block text-xs">{c[1]}</b><small className="text-[10px] text-slate-500">{c[2]}</small></div></div>)}</div>
         </div>
-      </main>
+      </Card>
     </div>
-  )
+    <div className="grid gap-4 xl:grid-cols-3">
+      <Card><SectionTitle action={()=>go('materials')}>Continue Learning</SectionTitle><div className="relative overflow-hidden rounded-lg"><img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80" className="h-36 w-full object-cover" alt="Automotive lesson"/><PlayCircle className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white" size={46}/></div><h3 className="mt-3 text-sm font-bold">1.1 Overview of Automotive Systems</h3><p className="mt-1 text-xs text-slate-500">Learn the fundamentals of modern automotive systems.</p><button onClick={()=>setCompleted(!completed)} className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">{completed?'✓ Completed':'Mark as Complete'}</button></Card>
+      <Card><SectionTitle action={()=>go('assignments')}>Recent Assignments</SectionTitle>{assignments.slice(0,3).map(a=><div key={a.title} className="flex items-center justify-between gap-2 border-b border-slate-100 py-3 last:border-0"><div><b className="block text-xs">{a.title}</b><small className="text-[10px] text-slate-500">Due: {a.due}</small></div><Status value={a.status}/></div>)}</Card>
+      <Card><SectionTitle action={()=>go('payments')}>Course Fee Payments</SectionTitle><div className="space-y-3 text-xs"><div className="flex justify-between"><span className="text-slate-500">Total Course Fee</span><b>LKR 300,000</b></div><div className="flex justify-between"><span className="text-slate-500">Amount Paid</span><b className="text-emerald-600">LKR 250,000</b></div><div className="flex justify-between border-t pt-3"><b>Outstanding</b><b className="text-red-600">LKR 50,000</b></div></div><button onClick={()=>go('payments')} className="mt-4 w-full rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white">Manage Payments</button></Card>
+    </div>
+    <div className="grid gap-4 lg:grid-cols-2"><Card><SectionTitle action={()=>go('announcements')}>Recent Announcements</SectionTitle><b className="text-sm">Welcome to Sterling Learning Portal</b><p className="mt-1 text-xs text-slate-500">Your courses, learning materials, assignments and payments are available here.</p></Card><Card><SectionTitle>Quick Links</SectionTitle><div className="grid grid-cols-2 gap-2">{[['My Courses','courses'],['Class Schedule','classes'],['Learning Materials','materials'],['Payment History','payments']].map(([name,id])=><button key={id} onClick={()=>go(id as Page)} className="rounded-lg bg-blue-50 p-3 text-left text-xs font-bold text-blue-700">{name} →</button>)}</div></Card></div>
+  </div>
+
+  const GenericPage = () => {
+    if (page === 'courses') return <div className="grid gap-4 lg:grid-cols-2">{['Automobile Technician — NVQ Level 4','Automobile Electrical Technician'].map((name,i)=><Card key={name}><div className="flex gap-4"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=300&q=80" className="h-28 w-32 rounded-lg object-cover" alt="Course"/><div className="flex-1"><Status value="Active"/><h3 className="mt-2 font-bold">{name}</h3><p className="mt-1 text-xs text-slate-500">TVEC · NVQ Level 4 · January Intake</p><div className="mt-3 h-2 rounded-full bg-slate-100"><div className={`h-2 rounded-full bg-blue-600 ${i?'w-[62%]':'w-[45%]'}`}/></div><small className="text-slate-500">{i?'62':'45'}% complete</small></div></div></Card>)}</div>
+    if (page === 'assignments') return <Card><div className="overflow-x-auto"><table className="w-full min-w-[560px] text-left text-xs"><thead><tr className="border-b text-slate-500"><th className="p-3">Assignment</th><th>Due Date</th><th>Status</th><th>Action</th></tr></thead><tbody>{assignments.map(a=><tr key={a.title} className="border-b border-slate-100"><td className="p-3 font-semibold">{a.title}</td><td>{a.due}</td><td><Status value={a.status}/></td><td><button className="rounded bg-blue-600 px-3 py-2 text-white">{a.status==='Submitted'?'View':'Upload'}</button></td></tr>)}</tbody></table></div></Card>
+    if (page === 'payments') return <Card className="max-w-2xl"><h3 className="font-bold">Course Fee Summary</h3>{[['Total Course Fee','LKR 300,000'],['Amount Paid','LKR 250,000'],['Outstanding Amount','LKR 50,000']].map(x=><div key={x[0]} className="flex justify-between border-b py-4 text-sm"><span className="text-slate-500">{x[0]}</span><b>{x[1]}</b></div>)}<div className="mt-5 flex flex-wrap gap-2"><button className="rounded-lg bg-blue-600 px-4 py-3 text-xs font-bold text-white">Pay Online</button><button className="rounded-lg border border-slate-200 px-4 py-3 text-xs font-bold">Upload Bank Slip</button></div><p className="mt-3 text-[11px] text-slate-400">Demo only — payment gateway is not connected.</p></Card>
+    if (page === 'attendance') return <><div className="grid gap-4 sm:grid-cols-3"><Card><p className="text-xs text-slate-500">Attendance this month</p><h2 className="mt-2 text-3xl font-extrabold">92%</h2></Card><Card><p className="text-xs text-slate-500">Classes attended</p><h2 className="mt-2 text-3xl font-extrabold">23</h2></Card><Card><p className="text-xs text-slate-500">Classes missed</p><h2 className="mt-2 text-3xl font-extrabold">2</h2></Card></div><Card className="mt-4"><h3 className="mb-3 font-bold">Recent Attendance</h3>{[['15 Jan','Engine Management Systems','Present'],['13 Jan','Workshop Practice','Present'],['10 Jan','Electrical Basics','Absent']].map(x=><div key={x[0]} className="flex justify-between border-b py-3 text-xs"><span>{x[0]} · {x[1]}</span><Status value={x[2]}/></div>)}</Card></>
+    const rows: Record<string,[string,string][]> = {
+      materials:[['Overview of Automotive Systems','Video · 12:45'],['Engine Components','PDF notes'],['Electrical Safety','Video · 18:20']],
+      assessments:[['Automotive Systems — Module 1 Quiz','20 questions · 30 minutes'],['Workshop Safety Assessment','15 questions · 20 minutes']],
+      classes:[['Engine Management Systems','15 Jan · 09:00 AM · Online Zoom'],['Automotive Electrical Basics','17 Jan · 01:00 PM · Main Campus'],['Practical Workshop','19 Jan · 09:00 AM · Workshop']],
+      messages:[['Student Support','Your new semester materials are now available.'],['Mr. Anura — Lecturer','Please submit the engine components assignment.']],
+      announcements:[['Welcome to Sterling LMS','Your courses and learning materials are now available.'],['Workshop schedule update','Please check your upcoming class schedule.']],
+      lecturers:[['Mr. Anura Perera','Automotive Technology Lecturer'],['Ms. Sanduni Fernando','Electrical Systems Lecturer']],
+      reports:[['Course Progress','45% completed'],['Attendance','92% this month'],['Assignments','8 of 11 submitted']],
+      settings:[['Student Name','Edit your profile details'],['Email Address','Update your contact email'],['Password','Change your account password']],
+    }
+    return <Card>{(rows[page] ?? []).map(([name,detail])=><div key={name} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"><div><b className="block text-sm">{name}</b><span className="text-xs text-slate-500">{detail}</span></div>{page==='materials'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white"><Download size={13} className="mr-1 inline"/>Open</button>:page==='classes'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Join Class</button>:page==='assessments'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Start</button>:null}</div>)}</Card>
+  }
+
+  if (!loggedIn) return <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#061b33] via-[#0b3a66] to-blue-600 p-4">
+    <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
+      <div className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-[#082544] p-10 text-white md:flex"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1000&q=85" alt="Automotive workshop" className="absolute inset-0 h-full w-full object-cover opacity-25"/><div className="absolute inset-0 bg-gradient-to-br from-[#061b33]/90 to-blue-900/60"/><div className="relative"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-full border-2 border-white"><GraduationCap size={25}/></div><div><b className="text-lg tracking-wider">STERLING</b><p className="text-[10px] tracking-[.2em] text-blue-200">TRAINING CENTRE</p></div></div><h1 className="mt-20 text-4xl font-extrabold leading-tight">Your Learning Journey Starts Here.</h1><p className="mt-5 max-w-sm text-sm leading-7 text-blue-100">Access your courses, lessons, assignments, attendance and payments from one student portal.</p></div><p className="relative text-xs text-blue-200">TVEC Approved Training Centre · Student Learning Portal</p></div>
+      <form onSubmit={signIn} className="flex flex-col justify-center p-7 sm:p-12"><p className="text-xs font-bold tracking-[.2em] text-blue-600">STUDENT PORTAL</p><h2 className="mt-3 text-3xl font-extrabold">Welcome Back!</h2><p className="mt-2 text-sm text-slate-500">Sign in to continue your learning journey.</p>
+        {error && <p className="mt-5 rounded-lg bg-red-50 p-3 text-xs text-red-700">{error}</p>}
+        <label className="mb-2 mt-7 text-xs font-bold">Student Email / ID</label><input value={studentId} onChange={e=>setStudentId(e.target.value)} placeholder="Enter your student email or ID" className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500" />
+        <label className="mb-2 mt-5 text-xs font-bold">Password</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"/>
+        <div className="mt-4 flex items-center justify-between text-xs text-slate-500"><label className="flex items-center gap-2"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/>Remember me</label><button type="button" onClick={()=>alert('Please contact the training centre to reset your password.')} className="font-bold text-blue-600">Forgot password?</button></div>
+        <button type="submit" className="mt-7 rounded-lg bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700">Sign In to Student Portal <ChevronRight size={16} className="ml-1 inline"/></button>
+        <div className="mt-5 rounded-lg bg-blue-50 p-3 text-[11px] leading-5 text-blue-900"><b>Preview demo access</b><br/>Enter any student ID/email and any password to explore this sample portal. Real authentication will be connected later.</div>
+        <p className="mt-7 text-center text-[10px] text-slate-400">© 2026 Sterling Training Centre. All rights reserved.</p>
+      </form>
+    </div>
+  </div>
+
+  return <div className="min-h-screen bg-[#f3f6fb] text-slate-900">
+    {mobileOpen && <button aria-label="Close navigation" onClick={()=>setMobileOpen(false)} className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"/>}
+    <aside className={`fixed inset-y-0 left-0 z-40 flex w-[230px] flex-col bg-[#082544] text-white transition-transform lg:translate-x-0 ${mobileOpen?'translate-x-0':'-translate-x-full'}`}>
+      <div className="flex h-20 items-center gap-3 border-b border-white/10 px-5"><div className="grid h-10 w-10 place-items-center rounded-full border-2 border-white"><GraduationCap size={22}/></div><div><b className="tracking-wide">STERLING</b><p className="text-[9px] tracking-[.2em] text-blue-200">TRAINING CENTRE</p></div><button onClick={()=>setMobileOpen(false)} className="ml-auto lg:hidden"><X size={18}/></button></div>
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">{nav.map(item=><button key={item.id} onClick={()=>go(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] font-medium ${page===item.id?'bg-blue-600 text-white':'text-blue-50 hover:bg-white/10'}`}><item.icon size={17}/>{item.label}</button>)}</nav>
+      <button onClick={()=>setLoggedIn(false)} className="flex items-center gap-3 border-t border-white/10 p-5 text-sm text-blue-100"><LogOut size={16}/>Sign out</button>
+    </aside>
+    <main className="min-h-screen lg:ml-[230px]">
+      <header className="sticky top-0 z-20 flex h-[66px] items-center justify-between border-b border-slate-200 bg-white/95 px-4 shadow-sm backdrop-blur sm:px-6"><div className="flex min-w-0 flex-1 items-center gap-3"><button onClick={()=>setMobileOpen(true)} className="rounded-lg p-2 lg:hidden"><Menu size={20}/></button><div className="relative w-full max-w-xl"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search courses, materials, or announcements..." className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-xs outline-none focus:border-blue-400"/></div></div><div className="ml-3 flex items-center gap-3"><Bell size={19} className="text-slate-500"/><div className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">{studentId.slice(0,2).toUpperCase()}</div><div className="hidden sm:block"><b className="block text-xs">Student Portal</b><span className="text-[10px] text-slate-500">Student account</span></div></div></header>
+      <div className="mx-auto w-full max-w-none p-3 sm:p-5 xl:p-6"><div className="mb-5"><h1 className="text-2xl font-extrabold">{title}</h1><p className="mt-1 text-xs text-slate-500">Sterling Training Centre · Student Learning Portal</p></div>{page==='dashboard'?<Dashboard/>:<GenericPage/>}<footer className="py-7 text-center text-[10px] text-slate-400">© 2026 Sterling Training Centre · Learning Management System</footer></div>
+    </main>
+  </div>
 }
 
 export default App
