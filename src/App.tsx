@@ -34,6 +34,8 @@ const assignments = [
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const [userRole, setUserRole] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
   const [adminPreview, setAdminPreview] = useState(false)
   const [studentId, setStudentId] = useState('')
   const [password, setPassword] = useState('')
@@ -44,14 +46,20 @@ function App() {
   const [search, setSearch] = useState('')
   const [completed, setCompleted] = useState(false)
 
-  const signIn = (e: React.FormEvent) => {
+  const signIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!studentId.trim() || !password.trim()) {
-      setError('Please enter your student ID/email and password.')
-      return
-    }
-    setError('')
-    setLoggedIn(true)
+    if (!studentId.trim() || !password.trim()) { setError('Please enter your email and password.'); return }
+    setAuthLoading(true); setError('')
+    try {
+      const response = await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', body: JSON.stringify({ email: studentId.trim(), password }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Sign in failed')
+      setUserRole(data.user.role); setLoggedIn(true); setPassword('')
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to sign in. Please try again.') }
+    finally { setAuthLoading(false) }
   }
 
   const title = nav.find(item => item.id === page)?.label ?? 'Dashboard'
@@ -110,6 +118,7 @@ function App() {
   }
 
   if (adminPreview) return <AdminPanel onExit={() => setAdminPreview(false)} />
+  if (loggedIn && userRole === 'admin') return <AdminPanel onExit={async () => { await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout', { method: 'POST', credentials: 'include' }); setLoggedIn(false); setUserRole('') }} />
 
   if (!loggedIn) return <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#061b33] via-[#0b3a66] to-blue-600 p-4">
     <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
@@ -119,9 +128,9 @@ function App() {
         <label className="mb-2 mt-7 text-xs font-bold">Student Email / ID</label><input value={studentId} onChange={e=>setStudentId(e.target.value)} placeholder="Enter your student email or ID" className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500" />
         <label className="mb-2 mt-5 text-xs font-bold">Password</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter your password" className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"/>
         <div className="mt-4 flex items-center justify-between text-xs text-slate-500"><label className="flex items-center gap-2"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/>Remember me</label><button type="button" onClick={()=>alert('Please contact the training centre to reset your password.')} className="font-bold text-blue-600">Forgot password?</button></div>
-        <button type="submit" className="mt-7 rounded-lg bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700">Sign In to Student Portal <ChevronRight size={16} className="ml-1 inline"/></button>
-        <div className="mt-5 rounded-lg bg-blue-50 p-3 text-[11px] leading-5 text-blue-900"><b>Preview demo access</b><br/>Enter any student ID/email and any password to explore this sample portal. Real authentication will be connected later.</div>
-        <div className="mt-5 border-t border-slate-100 pt-4 text-center"><button type="button" onClick={() => setAdminPreview(true)} className="text-xs font-bold text-slate-500 hover:text-blue-600">Open Admin Panel Preview →</button></div>
+        <button type="submit" disabled={authLoading} className="mt-7 rounded-lg bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-60">{authLoading ? "Signing in..." : "Sign In"} <ChevronRight size={16} className="ml-1 inline"/></button>
+        <div className="mt-5 rounded-lg bg-blue-50 p-3 text-[11px] leading-5 text-blue-900">Use your registered Sterling LMS account credentials. Student accounts will be enabled after registration records are added.</div>
+
         <p className="mt-7 text-center text-[10px] text-slate-400">© 2026 Sterling Training Centre. All rights reserved.</p>
       </form>
     </div>
