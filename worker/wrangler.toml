@@ -1,5 +1,5 @@
 name = "sterling-lms-api"
-main = "src/index.ts"
+main = "src/index.js"
 compatibility_date = "2026-10-31"
 workers_dev = true
 
