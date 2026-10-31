@@ -55,8 +55,8 @@ function App() {
           <div className="ml-4 flex items-center gap-4"><button className="relative text-slate-500"><Bell size={19}/><span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500"/></button><div className="hidden items-center gap-2 sm:flex"><div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-700">NP</div><div className="text-right"><p className="text-xs font-bold">Student Portal</p><p className="text-[10px] text-slate-500">Student account</p></div><ChevronDown size={14}/></div></div>
         </header>
 
-        <div className="mx-auto w-full max-w-[1700px] p-3 sm:p-5 xl:p-6">
-          <div className="grid grid-cols-1 gap-4 2xl:grid-cols-[minmax(330px,.95fr)_minmax(0,1.8fr)]">
+        <div className="w-full max-w-none p-3 sm:p-5 xl:p-6">
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(300px,.9fr)_minmax(0,1.6fr)]">
             <section className="relative flex min-h-[350px] flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 text-white shadow-sm sm:min-h-[390px]">
               <img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1100&q=85" alt="Automotive technician working on a vehicle" className="absolute inset-0 h-full w-full object-cover opacity-60"/>
               <div className="absolute inset-0 bg-gradient-to-t from-[#061b33] via-[#061b33]/65 to-[#061b33]/10"/>
