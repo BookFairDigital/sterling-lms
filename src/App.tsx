@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AdminPanel from './AdminPanel'
 import {
   Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
   CreditCard, FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
@@ -33,6 +34,7 @@ const assignments = [
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
+  const [adminPreview, setAdminPreview] = useState(false)
   const [studentId, setStudentId] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
@@ -107,6 +109,8 @@ function App() {
     return <Card>{(rows[page] ?? []).map(([name,detail])=><div key={name} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"><div><b className="block text-sm">{name}</b><span className="text-xs text-slate-500">{detail}</span></div>{page==='materials'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white"><Download size={13} className="mr-1 inline"/>Open</button>:page==='classes'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Join Class</button>:page==='assessments'?<button className="rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white">Start</button>:null}</div>)}</Card>
   }
 
+  if (adminPreview) return <AdminPanel onExit={() => setAdminPreview(false)} />
+
   if (!loggedIn) return <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#061b33] via-[#0b3a66] to-blue-600 p-4">
     <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
       <div className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-[#082544] p-10 text-white md:flex"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1000&q=85" alt="Automotive workshop" className="absolute inset-0 h-full w-full object-cover opacity-25"/><div className="absolute inset-0 bg-gradient-to-br from-[#061b33]/90 to-blue-900/60"/><div className="relative"><div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-full border-2 border-white"><GraduationCap size={25}/></div><div><b className="text-lg tracking-wider">STERLING</b><p className="text-[10px] tracking-[.2em] text-blue-200">TRAINING CENTRE</p></div></div><h1 className="mt-20 text-4xl font-extrabold leading-tight">Your Learning Journey Starts Here.</h1><p className="mt-5 max-w-sm text-sm leading-7 text-blue-100">Access your courses, lessons, assignments, attendance and payments from one student portal.</p></div><p className="relative text-xs text-blue-200">TVEC Approved Training Centre · Student Learning Portal</p></div>
@@ -117,6 +121,7 @@ function App() {
         <div className="mt-4 flex items-center justify-between text-xs text-slate-500"><label className="flex items-center gap-2"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/>Remember me</label><button type="button" onClick={()=>alert('Please contact the training centre to reset your password.')} className="font-bold text-blue-600">Forgot password?</button></div>
         <button type="submit" className="mt-7 rounded-lg bg-blue-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700">Sign In to Student Portal <ChevronRight size={16} className="ml-1 inline"/></button>
         <div className="mt-5 rounded-lg bg-blue-50 p-3 text-[11px] leading-5 text-blue-900"><b>Preview demo access</b><br/>Enter any student ID/email and any password to explore this sample portal. Real authentication will be connected later.</div>
+        <div className="mt-5 border-t border-slate-100 pt-4 text-center"><button type="button" onClick={() => setAdminPreview(true)} className="text-xs font-bold text-slate-500 hover:text-blue-600">Open Admin Panel Preview →</button></div>
         <p className="mt-7 text-center text-[10px] text-slate-400">© 2026 Sterling Training Centre. All rights reserved.</p>
       </form>
     </div>
