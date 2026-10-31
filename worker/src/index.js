@@ -82,7 +82,7 @@ export default {async fetch(req,env){
  }
  if(path==="/api/enrollments"&&req.method==="GET"){
   if(u.role!=="admin"&&u.role!=="lecturer")return json({error:"Access denied"},403,h);
-  const rows=await env.DB.prepare("SELECT e.id,e.status,e.created_at,s.student_number,s.full_name AS student_name,c.course_code,c.title AS course_title FROM enrollments e JOIN users s ON s.id=e.student_id JOIN courses c ON c.id=e.course_id ORDER BY e.created_at DESC").all();
+  const rows=await env.DB.prepare("SELECT e.id,e.status,e.created_at,s.student_number,s.full_name AS student_name,c.course_code,c.title AS course_title FROM enrollments e JOIN users s ON s.id=e.student_id JOIN courses c ON c.id=e.course_id ORDER BY e.enrolled_at DESC").all();
   return json(rows.results||[],200,h);
  }
  if(path==="/api/enrollments"&&req.method==="POST"){
