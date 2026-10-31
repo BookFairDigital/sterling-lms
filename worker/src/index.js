@@ -3,7 +3,7 @@ const hex=b=>Array.from(new Uint8Array(b),x=>x.toString(16).padStart(2,"0")).joi
 const hash=async s=>hex(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)));
 const random=n=>crypto.getRandomValues(new Uint8Array(n));
 const pwHash=async(p,s)=>{const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(p),"PBKDF2",false,["deriveBits"]);const salt=Uint8Array.from(s.match(/.{2}/g).map(x=>parseInt(x,16)));return hex(await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:100000,hash:"SHA-256"},k,256));};
-const cookie=(t,a)=>`sterling_session=${t}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${a}`;
+const cookie=(t,a)=>`sterling_session=${t}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${a}`;
 const getBody=async r=>{try{return await r.json()}catch{return null}};
 async function userFor(r,env){const t=r.headers.get("Cookie")?.match(/(?:^|; )sterling_session=([^;]+)/)?.[1];if(!t)return null;return await env.DB.prepare("SELECT u.id,u.email,u.full_name,u.role,u.status FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>CURRENT_TIMESTAMP AND u.status='active'").bind(await hash(t)).first();}
 export default {async fetch(req,env){
