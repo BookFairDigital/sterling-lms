@@ -1,0 +1,16 @@
+name = "sterling-lms-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-31"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sterling-lms-db"
+database_id = "87ea31a2-42f9-42e4-9902-53759468b0c5"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "sterling-lms-files"
+
+[vars]
+ALLOWED_ORIGIN = "https://bookfairdigital.github.io"
