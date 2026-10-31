@@ -47,7 +47,7 @@ export default {async fetch(req,env){
  }
  if(path==="/auth/login"&&req.method==="POST"){
   const b=await getBody(req),email=String(b?.email||"").trim().toLowerCase(),password=String(b?.password||"");
-  const u=await env.DB.prepare("SELECT id,email,full_name,role,status,password_hash FROM users WHERE email=?").bind(email).first();
+  const u=await env.DB.prepare("SELECT id,email,full_name,role,status,password_hash FROM users WHERE lower(email)=? OR student_number=? LIMIT 1").bind(email,String(b?.email||"").trim()).first();
   if(!u||u.status!=="active"||!u.password_hash)return json({error:"Invalid email or password"},401,h);
   const [salt,digest]=u.password_hash.split(":");if(!salt||await pwHash(password,salt)!==digest)return json({error:"Invalid email or password"},401,h);
   const token=hex(random(32).buffer),expires=new Date(Date.now()+604800000).toISOString();
@@ -57,6 +57,17 @@ export default {async fetch(req,env){
  if(path==="/auth/me"&&req.method==="GET"){const u=await userFor(req,env);return u?json({user:u},200,h):json({error:"Sign in required"},401,h);}
  if(path==="/auth/logout"&&req.method==="POST"){const t=req.headers.get("Cookie")?.match(/(?:^|; )sterling_session=([^;]+)/)?.[1];if(t)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await hash(t)).run();return json({ok:true},200,{...h,"set-cookie":cookie("",0)});}
  const u=await userFor(req,env);if(!u)return json({error:"Sign in required"},401,h);if(!["admin","lecturer"].includes(u.role))return json({error:"Forbidden"},403,h);
+ if(path==="/api/students"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),studentNumber=String(b?.student_number||"").trim(),name=String(b?.full_name||"").trim(),email=String(b?.email||"").trim().toLowerCase(),phone=String(b?.phone||"").trim(),password=String(b?.password||"");
+  if(!studentNumber||!name||!email||password.length<12)return json({error:"Student ID, full name, email and a password of at least 12 characters are required"},400,h);
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email))return json({error:"Enter a valid email address"},400,h);
+  const salt=hex(random(16).buffer),digest=await pwHash(password,salt);
+  try{
+   await env.DB.prepare("INSERT INTO users(id,student_number,full_name,email,phone,password_hash,role,status) VALUES(?,?,?,?,?,?,'student','active')").bind(crypto.randomUUID(),studentNumber,name,email,phone||null,salt+":"+digest).run();
+   return json({ok:true,student:{student_number:studentNumber,full_name:name,email,status:"active"}},201,h);
+  }catch(e){if(String(e?.message||e).toLowerCase().includes("unique"))return json({error:"That Student ID or email is already registered"},409,h);throw e;}
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
