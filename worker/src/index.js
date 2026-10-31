@@ -107,6 +107,17 @@ export default {async fetch(req,env){
   catch(e){await env.FILES.delete(key);throw e;}
   return json({ok:true,id,title,file_type:file.type,file_size:file.size},201,h);
  }
+ if(path==="/api/zoom-classes"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),courseId=String(b?.course_id||""),title=String(b?.title||"").trim(),meetingUrl=String(b?.meeting_url||"").trim(),startsAt=String(b?.starts_at||""),duration=Number(b?.duration_minutes||60);
+  if(!courseId||!title||!meetingUrl||!startsAt||!Number.isInteger(duration)||duration<1||duration>720)return json({error:"Course, title, meeting URL, date/time and valid duration are required"},400,h);
+  let url;try{url=new URL(meetingUrl)}catch{return json({error:"Enter a valid meeting URL"},400,h)}
+  if(url.protocol!=="https:")return json({error:"Meeting URL must use HTTPS"},400,h);
+  const course=await env.DB.prepare("SELECT id FROM courses WHERE id=?").bind(courseId).first();if(!course)return json({error:"Course not found"},404,h);
+  const id=crypto.randomUUID();
+  await env.DB.prepare("INSERT INTO zoom_classes(id,course_id,title,meeting_url,starts_at,duration_minutes,created_by) VALUES(?,?,?,?,?,?,?)").bind(id,courseId,title,meetingUrl,startsAt,duration,u.id).run();
+  return json({ok:true,id},201,h);
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
