@@ -35,6 +35,9 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const [materialForm, setMaterialForm] = useState({course_id:'',title:''})
   const [materialFile, setMaterialFile] = useState<File | null>(null)
   const [savingMaterial, setSavingMaterial] = useState(false)
+  const [zoomCourses, setZoomCourses] = useState<DataRow[]>([])
+  const [zoomForm, setZoomForm] = useState({course_id:'',title:'',meeting_url:'',starts_at:'',duration_minutes:'60'})
+  const [savingZoom, setSavingZoom] = useState(false)
   const title = sections.find(x => x.id === section)?.label || 'Overview'
   const load = useCallback(async (target: Section = section) => {
     setLoading(true); setError('')
@@ -49,12 +52,14 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
     finally { setLoading(false) }
   }, [section])
   useEffect(() => { void load(section) }, [section, load])
+  useEffect(() => { if (section === 'zoom') { fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setZoomCourses(Array.isArray(d)?d:[])).catch(()=>setError('Could not load courses for Zoom classes')) } }, [section])
   useEffect(() => { if (section === 'materials') { fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setMaterialCourses(Array.isArray(d)?d:[])).catch(()=>setError('Could not load courses for materials')) } }, [section])
   useEffect(() => { if (section === 'enrollments') { Promise.all([fetch(API+'/api/students',{credentials:'include'}).then(r=>r.json()),fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json())]).then(([students,courses])=>{setEnrollmentStudents(Array.isArray(students)?students:[]);setEnrollmentCourses(Array.isArray(courses)?courses:[])}).catch(()=>setError('Could not load students and courses for enrolment')) } }, [section])
   const pretty = (value: unknown) => value === null || value === undefined || value === '' ? '—' : String(value)
   const columns: Record<Exclude<Section, 'overview'>, string[]> = {
     enrollments: ['student_number', 'student_name', 'course_code', 'course_title', 'status', 'created_at'],
     materials: ['title','course_title','file_type','file_size','created_at'],
+    zoom: ['title','course_title','starts_at','duration_minutes','meeting_url'],
     students: ['student_number', 'full_name', 'email', 'phone', 'status'],
     courses: ['course_code', 'title', 'fee_amount', 'currency', 'status'],
     payments: ['id', 'student_name', 'course_title', 'amount', 'currency', 'status'],
@@ -70,6 +75,15 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
       {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       {section === 'overview' ? <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{[{label:'Total Students',key:'students',icon:Users},{label:'Published Courses',key:'courses',icon:BookOpen},{label:'Pending Payments',key:'pending_payments',icon:CircleDollarSign},{label:'Upcoming Classes',key:'upcoming_classes',icon:Video}].map(k => {const Icon=k.icon;return <section key={k.key} className="rounded-xl border bg-white p-5 shadow-sm"><div className="flex items-center justify-between text-xs font-semibold text-slate-500">{k.label}<Icon size={19}/></div><p className="mt-4 text-3xl font-extrabold">{dashboard ? pretty(dashboard[k.key]) : '—'}</p></section>})}<section className="rounded-xl border bg-white p-5 text-sm text-slate-600 sm:col-span-2 xl:col-span-4"><Activity className="mb-2 text-blue-600"/>Live summary. Counts reflect actual records currently stored in the database; no sample records are inserted.</section></div> :
       <section className="overflow-hidden rounded-xl border bg-white shadow-sm">
+        {section === 'zoom' && <div className="border-b p-4 text-xs text-slate-500">Schedule an online class and attach its secure HTTPS meeting link.</div>}
+        {section === 'zoom' && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e=>{e.preventDefault();setSavingZoom(true);setError('');setNotice('');try{const r=await fetch(API+'/api/zoom-classes',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...zoomForm,duration_minutes:Number(zoomForm.duration_minutes),starts_at:new Date(zoomForm.starts_at).toISOString()})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not schedule class');setNotice('Zoom class scheduled successfully.');setZoomForm({course_id:'',title:'',meeting_url:'',starts_at:'',duration_minutes:'60'});await load('zoom')}catch(e){setError(e instanceof Error?e.message:'Could not schedule class')}finally{setSavingZoom(false)}}}>
+          <label className="text-xs font-semibold text-slate-600">Course<select required value={zoomForm.course_id} onChange={e=>setZoomForm(v=>({...v,course_id:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"><option value="">Select course</option>{zoomCourses.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.course_code||'')} · {String(c.title||'')}</option>)}</select></label>
+          <label className="text-xs font-semibold text-slate-600">Class title<input required value={zoomForm.title} onChange={e=>setZoomForm(v=>({...v,title:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
+          <label className="text-xs font-semibold text-slate-600">Date & time<input required type="datetime-local" value={zoomForm.starts_at} onChange={e=>setZoomForm(v=>({...v,starts_at:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
+          <label className="text-xs font-semibold text-slate-600">Duration (minutes)<input required type="number" min="1" max="720" value={zoomForm.duration_minutes} onChange={e=>setZoomForm(v=>({...v,duration_minutes:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
+          <label className="text-xs font-semibold text-slate-600 sm:col-span-2">Zoom / meeting URL<input required type="url" placeholder="https://..." value={zoomForm.meeting_url} onChange={e=>setZoomForm(v=>({...v,meeting_url:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
+          <div><button disabled={savingZoom||zoomCourses.length===0} className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white disabled:opacity-50">{savingZoom?'Saving…':'Schedule Class'}</button></div>
+        </form>}
         {section === 'materials' && <div className="border-b p-4"><span className="text-xs text-slate-500">Upload learning resources to secure storage (maximum 20 MB per file)</span></div>}
         {section === 'materials' && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e=>{e.preventDefault();if(!materialFile)return;setSavingMaterial(true);setError('');setNotice('');try{const fd=new FormData();fd.append('course_id',materialForm.course_id);fd.append('title',materialForm.title);fd.append('file',materialFile);const r=await fetch(API+'/api/materials',{method:'POST',credentials:'include',body:fd});const d=await r.json();if(!r.ok)throw new Error(d.error||'Upload failed');setNotice('Material uploaded successfully.');setMaterialForm({course_id:'',title:''});setMaterialFile(null);await load('materials')}catch(e){setError(e instanceof Error?e.message:'Upload failed')}finally{setSavingMaterial(false)}}}>
           <label className="text-xs font-semibold text-slate-600">Course<select required value={materialForm.course_id} onChange={e=>setMaterialForm(v=>({...v,course_id:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"><option value="">Select course</option>{materialCourses.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.course_code||'')} · {String(c.title||'')}</option>)}</select></label>
