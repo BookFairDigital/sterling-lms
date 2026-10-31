@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import {
   Activity, Bell, BookOpen, ChevronRight, CircleDollarSign,
   ClipboardList, GraduationCap, LayoutDashboard, LogOut, Menu, Search,
-  Users, Wallet, X, Plus, Filter,
+  Users, Wallet, X, Plus, Filter, Video, CalendarDays, ExternalLink,
 } from 'lucide-react'
 
-type Section = 'overview' | 'students' | 'courses' | 'payments' | 'materials' | 'announcements'
+type Section = 'overview' | 'students' | 'courses' | 'payments' | 'materials' | 'announcements' | 'zoom'
 
 const menu: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -14,6 +14,7 @@ const menu: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'payments', label: 'Payments', icon: Wallet },
   { id: 'materials', label: 'Learning Materials', icon: ClipboardList },
   { id: 'announcements', label: 'Announcements', icon: Bell },
+  { id: 'zoom', label: 'Zoom Classes', icon: Video },
 ]
 
 const students = [
@@ -36,6 +37,11 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const [notice, setNotice] = useState('')
   const [paymentStatuses, setPaymentStatuses] = useState<Record<string, string>>({})
   const [announcement, setAnnouncement] = useState('')
+  const [zoomClasses, setZoomClasses] = useState<{ id: number; title: string; date: string; time: string; link: string }[]>([])
+  const [zoomTitle, setZoomTitle] = useState('')
+  const [zoomDate, setZoomDate] = useState('')
+  const [zoomTime, setZoomTime] = useState('')
+  const [zoomLink, setZoomLink] = useState('')
   const title = menu.find(x => x.id === section)?.label ?? 'Overview'
   const filteredStudents = useMemo(() => students.filter(s => [s.id, s.name, s.email, s.course].join(' ').toLowerCase().includes(query.toLowerCase())), [query])
   const filteredPayments = useMemo(() => payments.filter(p => [p.ref, p.student, p.status].join(' ').toLowerCase().includes(query.toLowerCase())), [query])
@@ -56,7 +62,7 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
         <div className="ml-3 flex items-center gap-3"><span className="hidden text-xs font-semibold text-slate-500 sm:block">Administrator preview</span><div className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">AD</div></div>
       </header>
       <div className="mx-auto max-w-[1500px] p-4 sm:p-6">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-600">Sterling LMS · Admin</p><h1 className="mt-1 text-2xl font-extrabold">{title}</h1><p className="mt-1 text-xs text-slate-500">Manage your training centre from one place.</p></div>{section !== 'overview' && <button onClick={() => setNotice('This action will be enabled when the secure backend is connected.')} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white"><Plus size={15}/>Add {section === 'students' ? 'Student' : section === 'courses' ? 'Course' : section === 'materials' ? 'Material' : section === 'announcements' ? 'Announcement' : 'Record'}</button>}</div>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-600">Sterling LMS · Admin</p><h1 className="mt-1 text-2xl font-extrabold">{title}</h1><p className="mt-1 text-xs text-slate-500">Manage your training centre from one place.</p></div>{section !== 'overview' && <button onClick={() => setNotice('This action will be enabled when the secure backend is connected.')} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white"><Plus size={15}/>Add {section === 'students' ? 'Student' : section === 'courses' ? 'Course' : section === 'materials' ? 'Material' : section === 'announcements' ? 'Announcement' : section === 'zoom' ? 'Zoom Class' : 'Record'}</button>}</div>
         {notice && <div className="mb-4 flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-blue-800"><span>{notice}</span><button onClick={() => setNotice('')}><X size={15}/></button></div>}
         {section === 'overview' && <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -71,6 +77,19 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
         {section === 'courses' && <div className="grid gap-4 lg:grid-cols-2">{[{ name: 'Automobile Technician', level: 'NVQ Level 4', students: 74, state: 'Published' }, { name: 'Automobile Electrical Technician', level: 'NVQ Level 4', students: 54, state: 'Published' }, { name: 'Automotive Workshop Practice', level: 'Short Course', students: 0, state: 'Draft' }].map(c => <Card key={c.name}><div className="flex items-start justify-between"><div><h2 className="font-bold">{c.name}</h2><p className="mt-1 text-xs text-slate-500">{c.level}</p></div><Pill value={c.state === 'Published' ? 'Active' : 'Pending'}/></div><div className="mt-5 flex items-center justify-between border-t pt-4 text-xs"><span className="text-slate-500">{c.students} enrolled students</span><button onClick={() => setNotice('Course editing will be enabled after backend integration.')} className="font-bold text-blue-600">Manage course</button></div></Card>)}</div>}
         {section === 'payments' && <Card><div className="mb-4 flex items-center justify-between"><h2 className="font-bold">Payment Review Queue</h2><button onClick={() => setNotice('Filters will be available with live payment records.')} className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500"><Filter size={14}/>Filter</button></div><div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-xs"><thead className="border-b text-slate-400"><tr><th className="p-3">Reference</th><th>Student</th><th>Amount</th><th>Date</th><th>Status</th><th>Review</th></tr></thead><tbody>{filteredPayments.map(p => <tr key={p.ref} className="border-b border-slate-100"><td className="p-3 font-bold">{p.ref}</td><td>{p.student}</td><td>{p.amount}</td><td>{p.date}</td><td><Pill value={paymentStatuses[p.ref] ?? p.status}/></td><td><div className="flex gap-2"><button onClick={() => setPaymentStatuses(v => ({ ...v, [p.ref]: 'Approved' }))} className="rounded bg-emerald-50 px-2 py-1 font-bold text-emerald-700">Approve</button><button onClick={() => setPaymentStatuses(v => ({ ...v, [p.ref]: 'Rejected' }))} className="rounded bg-red-50 px-2 py-1 font-bold text-red-700">Reject</button></div></td></tr>)}</tbody></table></div></Card>}
         {section === 'materials' && <Card><h2 className="mb-3 font-bold">Learning Material Library</h2>{[['Introduction to Automotive Systems','Video lesson · Module 01'],['Engine Components','PDF study material · Module 02'],['Electrical Safety Guidelines','PDF study material · Module 03']].map(([name,detail]) => <div key={name} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4 last:border-0"><div><b className="block text-xs">{name}</b><span className="text-[11px] text-slate-400">{detail}</span></div><button onClick={() => setNotice('Upload and storage will be connected to the secure course library.')} className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold">Manage file</button></div>)}</Card>}
+        {section === 'zoom' && <div className="grid gap-4 xl:grid-cols-[.9fr_1.1fr]">
+          <Card><h2 className="mb-1 font-bold">Add Zoom Class</h2><p className="mb-4 text-xs text-slate-500">Enter the class details and paste the Zoom meeting URL for students.</p>
+            <form onSubmit={e => { e.preventDefault(); if (!zoomTitle.trim() || !zoomDate || !zoomTime || !/^https?:\\/\\//i.test(zoomLink.trim())) { setNotice('Please complete all fields and enter a valid Zoom meeting URL.'); return } setZoomClasses(v => [...v, { id: Date.now(), title: zoomTitle.trim(), date: zoomDate, time: zoomTime, link: zoomLink.trim() }]); setZoomTitle(''); setZoomDate(''); setZoomTime(''); setZoomLink(''); setNotice('Zoom class added to this preview. It is not yet saved to the live database.') }}>
+              <label className="mb-1 block text-xs font-semibold">Class title</label><input required value={zoomTitle} onChange={e => setZoomTitle(e.target.value)} placeholder="e.g. Engine Management Systems" className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"/>
+              <div className="grid gap-3 sm:grid-cols-2"><div><label className="mb-1 block text-xs font-semibold">Class date</label><input required type="date" value={zoomDate} onChange={e => setZoomDate(e.target.value)} className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm"/></div><div><label className="mb-1 block text-xs font-semibold">Start time</label><input required type="time" value={zoomTime} onChange={e => setZoomTime(e.target.value)} className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm"/></div></div>
+              <label className="mb-1 block text-xs font-semibold">Zoom meeting link</label><input required type="url" value={zoomLink} onChange={e => setZoomLink(e.target.value)} placeholder="https://zoom.us/j/..." className="mb-4 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"/>
+              <button type="submit" className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white"><Plus size={15}/>Add Zoom Class</button>
+            </form>
+          </Card>
+          <Card><div className="mb-4 flex items-center justify-between"><h2 className="font-bold">Scheduled Zoom Classes</h2><span className="text-[11px] text-slate-400">{zoomClasses.length} added</span></div>
+            {zoomClasses.length === 0 ? <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center"><Video className="mx-auto mb-2 text-slate-300" size={28}/><p className="text-sm font-semibold text-slate-600">No Zoom classes added yet</p><p className="mt-1 text-xs text-slate-400">Add a class using the form.</p></div> : <div className="space-y-3">{zoomClasses.map(c => <div key={c.id} className="rounded-lg border border-slate-200 p-4"><div className="flex flex-wrap items-start justify-between gap-2"><div><b className="text-sm">{c.title}</b><p className="mt-2 flex items-center gap-2 text-xs text-slate-500"><CalendarDays size={14}/>{c.date} · {c.time}</p></div><button onClick={() => setZoomClasses(v => v.filter(x => x.id !== c.id))} className="text-xs font-semibold text-red-600">Remove</button></div><a href={c.link} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 break-all text-xs font-semibold text-blue-600">Open Zoom meeting <ExternalLink size={13}/></a></div>)}</div>}
+          </Card>
+        </div>}
         {section === 'announcements' && <Card><h2 className="mb-3 font-bold">Create Announcement</h2><label className="mb-2 block text-xs font-semibold">Announcement message</label><textarea value={announcement} onChange={e => setAnnouncement(e.target.value)} rows={4} placeholder="Write an update for students..." className="w-full rounded-lg border border-slate-200 p-3 text-sm outline-none focus:border-blue-500"/><button onClick={() => setNotice(announcement.trim() ? 'Draft saved in this preview only. Connect the backend to publish to students.' : 'Please enter an announcement first.')} className="mt-3 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-bold text-white">Save announcement</button></Card>}
         <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-[11px] leading-5 text-amber-900"><b>Preview build — not connected to live student data.</b> The records and dashboard figures above are sample content. Secure administrator sign-in, database permissions, and saving changes must be connected before using this panel with real student information.</div>
         <footer className="py-7 text-center text-[10px] text-slate-400">Sterling Training Centre · Administration</footer>
