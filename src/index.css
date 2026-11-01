@@ -101,9 +101,9 @@ button { cursor: pointer; }
 .sterling-home .sterling-topbar a { transition: color 220ms ease, opacity 220ms ease; }
 .sterling-home .sterling-topbar a:hover { color: #93c5fd; opacity: .95; }
 @keyframes sterling-topbar-swipe {
-  0%, 18% { left: -28%; opacity: 0; }
+  0%, 18% { left: 112%; opacity: 0; }
   28% { opacity: 1; }
-  58%, 100% { left: 112%; opacity: 0; }
+  58%, 100% { left: -28%; opacity: 0; }
 }
 @keyframes sterling-topbar-enter {
   from { opacity: 0; transform: translateY(-5px); }
