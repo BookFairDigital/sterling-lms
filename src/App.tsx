@@ -5,8 +5,7 @@ import {
   Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
   FileText, LayoutDashboard, LogOut, Menu,
   Search, Settings, Users, Video, Wallet, X,
-  ChevronRight, Download, BookMarked, Award, Layers, MapPin,
-  ShieldCheck, Building2, BriefcaseBusiness, MapPinned, GraduationCap, Wrench, TrendingUp, Home, UserRound,
+  ChevronRight, Download, BookMarked,
 } from 'lucide-react'
 
 const nav = [
@@ -180,7 +179,7 @@ function App() {
 
 
   const featuredCourses=publicCourses.filter(c=>/automobile electrical technician|automobile technician/i.test(String(c.title||''))).slice(0,2)
-  useEffect(()=>{if(loggedIn||showLogin)return;const nodes=Array.from(document.querySelectorAll<HTMLElement>('.sterling-premium section, .sterling-home footer, .sterling-home section .grid > *, .sterling-home > div > .mx-auto.grid > *'));if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){nodes.forEach(n=>n.classList.add('is-visible'));return}const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:0.08,rootMargin:'0px 0px -40px 0px'});nodes.forEach((n,i)=>{n.classList.add('sterling-reveal');n.style.transitionDelay=`${(i%4)*85}ms`;observer.observe(n)});return()=>observer.disconnect()},[loggedIn,showLogin])
+  useEffect(()=>{if(loggedIn||showLogin)return;const nodes=Array.from(document.querySelectorAll<HTMLElement>('.sterling-premium section, .sterling-premium footer, .sterling-premium section .grid > *, .sterling-premium > div > .mx-auto.grid > *'));if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){nodes.forEach(n=>n.classList.add('is-visible'));return}const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:0.08,rootMargin:'0px 0px -40px 0px'});nodes.forEach((n,i)=>{n.classList.add('sterling-reveal');n.style.transitionDelay=`${(i%4)*85}ms`;observer.observe(n)});return()=>observer.disconnect()},[loggedIn,showLogin])
   const PublicWebsite=()=> <PremiumLanding
     courses={publicCourses}
     gallery={publicGallery}
