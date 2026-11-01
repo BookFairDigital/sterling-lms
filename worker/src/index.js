@@ -312,6 +312,42 @@ export default {async fetch(req,env){
   await env.DB.batch(valid.map(q=>env.DB.prepare("INSERT INTO assessment_questions(id,assessment_id,question,option_a,option_b,option_c,option_d,correct_option,marks) VALUES(?,?,?,?,?,?,?,?,?)").bind(crypto.randomUUID(),id,q.question,q.opts[0],q.opts[1],q.opts[2]||null,q.opts[3]||null,q.correct,q.marks)));
   return json({ok:true,id,total_marks:total,question_count:valid.length},201,h);
  }
+
+ if(path.match(/^\/api\/assessments\/[^/]+\/attempts$/)&&req.method==="GET"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const id=path.split("/")[3];
+  const rows=await env.DB.prepare("SELECT t.id,t.score,t.total_marks,t.passed,t.submitted_at,u.full_name,u.student_number,a.title assessment_title FROM assessment_attempts t JOIN users u ON u.id=t.student_id JOIN assessments a ON a.id=t.assessment_id WHERE t.assessment_id=? ORDER BY t.submitted_at DESC").bind(id).all();
+  return json(rows.results||[],200,h);
+ }
+ if(path.match(/^\/api\/assessments\/[^/]+\/questions$/)&&req.method==="GET"){
+  if(u.role!=="student")return json({error:"Student access required"},403,h);
+  const id=path.split("/")[3];
+  const assessment=await env.DB.prepare("SELECT a.id,a.title,a.description,a.duration_minutes,a.total_marks,a.pass_mark,c.title course_title FROM assessments a JOIN courses c ON c.id=a.course_id JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' WHERE a.id=? AND a.status='published'").bind(u.id,id).first();
+  if(!assessment)return json({error:"Assessment not available for your account"},404,h);
+  const questions=await env.DB.prepare("SELECT id,question,option_a,option_b,option_c,option_d,marks FROM assessment_questions WHERE assessment_id=? ORDER BY rowid").bind(id).all();
+  return json({assessment,questions:questions.results||[]},200,h);
+ }
+ if(path.match(/^\/api\/student\/assessments\/[^/]+\/submit$/)&&req.method==="POST"){
+  if(u.role!=="student")return json({error:"Student access required"},403,h);
+  const id=path.split("/")[4],b=await getBody(req),answers=b?.answers;
+  const assessment=await env.DB.prepare("SELECT a.id,a.total_marks,a.pass_mark FROM assessments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' WHERE a.id=? AND a.status='published'").bind(u.id,id).first();
+  if(!assessment)return json({error:"Assessment not available"},404,h);
+  if(!answers||typeof answers!=="object"||Array.isArray(answers))return json({error:"Submit your answers"},400,h);
+  const questions=await env.DB.prepare("SELECT id,correct_option,marks FROM assessment_questions WHERE assessment_id=?").bind(id).all();
+  if(!questions.results?.length)return json({error:"Assessment has no questions"},400,h);
+  const prior=await env.DB.prepare("SELECT id FROM assessment_attempts WHERE assessment_id=? AND student_id=?").bind(id,u.id).first();
+  if(prior)return json({error:"You have already submitted this assessment"},409,h);
+  let score=0;const safe={};
+  for(const q of questions.results){const answer=String(answers[q.id]||"").toLowerCase();if(!["a","b","c","d"].includes(answer))return json({error:"Please answer every question"},400,h);safe[q.id]=answer;if(answer===q.correct_option)score+=Number(q.marks);}
+  const attempt=crypto.randomUUID(),passed=score>=Number(assessment.pass_mark)?1:0;
+  await env.DB.prepare("INSERT INTO assessment_attempts(id,assessment_id,student_id,score,total_marks,passed,answers_json) VALUES(?,?,?,?,?,?,?)").bind(attempt,id,u.id,score,Number(assessment.total_marks),passed,JSON.stringify(safe)).run();
+  return json({ok:true,score,total_marks:Number(assessment.total_marks),pass_mark:Number(assessment.pass_mark),passed:!!passed,submitted_at:new Date().toISOString()},201,h);
+ }
+ if(path==="/api/student/assessment-results"&&req.method==="GET"){
+  if(u.role!=="student")return json({error:"Student access required"},403,h);
+  const rows=await env.DB.prepare("SELECT t.id,t.score,t.total_marks,t.passed,t.submitted_at,a.title assessment_title FROM assessment_attempts t JOIN assessments a ON a.id=t.assessment_id WHERE t.student_id=? ORDER BY t.submitted_at DESC").bind(u.id).all();
+  return json(rows.results||[],200,h);
+ }
  if(path==="/api/student/assessments"&&req.method==="GET"){
   if(u.role!=="student")return json({error:"Student access required"},403,h);
   const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.duration_minutes,a.total_marks,a.pass_mark,c.course_code,c.title course_title,(SELECT COUNT(*) FROM assessment_questions q WHERE q.assessment_id=a.id) question_count FROM assessments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' JOIN courses c ON c.id=a.course_id WHERE a.status='published' ORDER BY a.created_at DESC").bind(u.id).all();
