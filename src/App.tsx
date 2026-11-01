@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import AdminPanel from './AdminPanel'\nimport PremiumLanding from './PremiumLanding'
+import AdminPanel from './AdminPanel'
+import PremiumLanding from './PremiumLanding'
 import BrandLogo from './BrandLogo'
 import {
   Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
