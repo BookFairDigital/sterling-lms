@@ -2,7 +2,7 @@ import { useState, type FormEvent, type Dispatch, type SetStateAction } from 're
 import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
-  GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings, House, FilePenLine, UserRound,
+  GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings, House, FilePenLine, UserRound, LockKeyhole,
   ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck,
 } from 'lucide-react'
 
@@ -199,18 +199,18 @@ export default function PremiumLanding(props: Props) {
 
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
 
-    <nav aria-label="Mobile quick navigation" className="fixed inset-x-0 bottom-0 z-[70] grid grid-cols-5 border-t border-white/10 bg-[#121729]/95 px-1 pt-2 shadow-[0_-10px_35px_rgba(0,0,0,.4)] backdrop-blur-xl sm:hidden" style={{paddingBottom:'max(9px, env(safe-area-inset-bottom))'}}>
+    <nav aria-label="Mobile quick navigation" className="fixed inset-x-0 bottom-0 z-[70] grid grid-cols-5 border-t-2 border-[#e31b23]/70 bg-[#080a0c]/[.97] px-1 pt-2 shadow-[0_-8px_30px_rgba(227,27,35,.12)] backdrop-blur-xl sm:hidden" style={{paddingBottom:'max(9px, env(safe-area-inset-bottom))'}}>
       {[
         {label:'Home',href:'#home',icon:House},
         {label:'Courses',href:'#courses',icon:GraduationCap},
         {label:'Locations',href:'#locations',icon:MapPin},
         {label:'Apply',href:'#apply',icon:FilePenLine},
-      ].map(({label,href,icon:Icon})=><a key={label} href={href} onClick={()=>setMobileTab(label)} aria-current={mobileTab===label?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab===label?'text-[#e34246]':'text-slate-400 hover:text-white')}>
-        <Icon size={27} strokeWidth={mobileTab===label?2.7:2.2} fill={label==='Home'&&mobileTab===label?'currentColor':'none'}/>
+      ].map(({label,href,icon:Icon})=><a key={label} href={href} onClick={()=>setMobileTab(label)} aria-current={mobileTab===label?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab===label?'text-[#e31b23]':'text-[#aeb4bf] hover:text-white')}>
+        <Icon size={28} strokeWidth={mobileTab===label?2.6:2.1} fill={label==='Home'?'currentColor':'none'}/>
         <span className="text-[11px] font-semibold leading-tight">{label}</span>
       </a>)}
-      <button type="button" onClick={()=>{setMobileTab('Login');props.onLogin()}} aria-current={mobileTab==='Login'?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab==='Login'?'text-[#e34246]':'text-slate-400 hover:text-white')}>
-        <UserRound size={27} strokeWidth={mobileTab==='Login'?2.7:2.2}/>
+      <button type="button" onClick={()=>{setMobileTab('Login');props.onLogin()}} aria-current={mobileTab==='Login'?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab==='Login'?'text-[#e31b23]':'text-[#aeb4bf] hover:text-white')}>
+        <span className="relative inline-flex"><UserRound size={27} strokeWidth={mobileTab==='Login'?2.6:2.1}/><LockKeyhole size={12} strokeWidth={2.4} className="absolute -bottom-0.5 -right-2 rounded-sm bg-[#080a0c]"/></span>
         <span className="text-[11px] font-semibold leading-tight">Login</span>
       </button>
     </nav>
