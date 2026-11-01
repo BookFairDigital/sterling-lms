@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type Dispatch, type SetStateAction } from 'react'
 import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
@@ -24,13 +24,13 @@ type Props = {
   settings: Record<string, string>
   onLogin: () => void
   applicationForm: any
-  setApplicationForm: (updater: (value: any) => any) => void
+  setApplicationForm: Dispatch<SetStateAction<any>>
   applicationNotice: string
   applicationError: string
   applicationBusy: boolean
   onApplySubmit: (event: FormEvent<HTMLFormElement>) => void
   chatForm: any
-  setChatForm: (updater: (value: any) => any) => void
+  setChatForm: Dispatch<SetStateAction<any>>
   chatNotice: string
   onChatSubmit: (event: FormEvent<HTMLFormElement>) => void
 }
@@ -189,16 +189,19 @@ export default function PremiumLanding(props: Props) {
       </div>
     </section>
 
-    <section id="contact" className="scroll-mt-24 border-t border-white/10 bg-[#111519] px-4 py-14 sm:px-7"><div className="mx-auto grid max-w-[1200px] gap-8 lg:grid-cols-2"><div><p className="text-[10px] font-black uppercase tracking-[.3em] text-red-500">Contact Sterling</p><h2 className="mt-2 text-3xl font-black">Talk to our team.</h2><p className="mt-3 text-sm leading-6 text-neutral-400">For course details, training locations and admissions enquiries, contact the Sterling team.</p><div className="mt-6 space-y-3 text-sm"><a className="flex items-center gap-3 hover:text-red-400" href="tel:+94117600800"><Phone size={16} className="text-red-500"/>+94 11 760 0800</a><a className="flex items-center gap-3 hover:text-red-400" href="mailto:callcenter@sterling.lk"><Mail size={16} className="text-red-500"/>callcenter@sterling.lk</a><a className="flex items-center gap-3 hover:text-red-400" href="https://www.sterling.lk/" target="_blank" rel="noreferrer"><MapPin size={16} className="text-red-500"/>Official Sterling website</a></div></div>
+    <section id="contact" className="scroll-mt-24 border-t border-white/10 bg-[#111519] px-4 py-14 sm:px-7"><div className="mx-auto grid max-w-[1200px] gap-8 lg:grid-cols-2"><div><p className="text-[10px] font-black uppercase tracking-[.3em] text-red-500">Contact Sterling</p><h2 className="mt-2 text-3xl font-black">Talk to our team.</h2><p className="mt-3 text-sm leading-6 text-neutral-400">For course details, training locations and admissions enquiries, contact the Sterling team.</p><div className="mt-6 space-y-3 text-sm"><a className="flex items-center gap-3 hover:text-red-400" href="tel:+94117600800"><Phone size={16} className="text-red-500"/>+94 11 760 0800</a><a className="flex items-center gap-3 hover:text-red-400" href="mailto:callcenter@sterling.lk"><Mail size={16} className="text-red-500"/>callcenter@sterling.lk</a><p className="flex items-center gap-3 text-neutral-300"><MapPin size={16} className="text-red-500"/>193, Station Road, Udahamulla, Nugegoda</p><a className="flex items-center gap-3 hover:text-red-400" href="https://www.sterling.lk/" target="_blank" rel="noreferrer"><MapPin size={16} className="text-red-500"/>Official Sterling website</a></div></div>
       <form onSubmit={props.onChatSubmit} className="rounded-2xl border border-white/10 bg-[#0b0e11] p-5"><h3 className="text-lg font-extrabold">Send an enquiry</h3>{props.chatNotice&&<p className="mt-3 rounded-lg bg-emerald-950 p-3 text-xs text-emerald-300">{props.chatNotice}</p>}<div className="mt-4 grid gap-3 sm:grid-cols-2"><input required placeholder="Your name" value={props.chatForm.name} onChange={e=>props.setChatForm(v=>({...v,name:e.target.value}))} className="rounded-lg border border-white/15 bg-[#151a1f] px-3 py-3 text-sm outline-none focus:border-red-500"/><input required type="email" placeholder="Email address" value={props.chatForm.email} onChange={e=>props.setChatForm(v=>({...v,email:e.target.value}))} className="rounded-lg border border-white/15 bg-[#151a1f] px-3 py-3 text-sm outline-none focus:border-red-500"/><textarea required rows={3} placeholder="How can we help?" value={props.chatForm.message} onChange={e=>props.setChatForm(v=>({...v,message:e.target.value}))} className="rounded-lg border border-white/15 bg-[#151a1f] px-3 py-3 text-sm outline-none focus:border-red-500 sm:col-span-2"/><button className="rounded-lg bg-red-600 px-5 py-3 text-xs font-black hover:bg-red-700 sm:col-span-2">Send Enquiry <ArrowRight size={14} className="ml-1 inline"/></button></div></form>
     </div></section>
 
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
     <style>{`
       html { scroll-behavior: smooth; }
-      .sterling-premium section { scroll-margin-top: 88px; }\n      .sterling-premium .sterling-reveal { opacity: 0; transform: translate3d(0,24px,0); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }\n      .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: translate3d(0,0,0); }
+      .sterling-premium section { scroll-margin-top: 88px; }
+      .sterling-premium .sterling-reveal { opacity: 0; transform: translate3d(0,24px,0); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }
+      .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: translate3d(0,0,0); }
       .sterling-premium img, .sterling-premium video { backface-visibility: hidden; }
-      @media (prefers-reduced-motion: reduce) {\n        .sterling-premium .sterling-reveal, .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: none; }
+      @media (prefers-reduced-motion: reduce) {
+        .sterling-premium .sterling-reveal, .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: none; }
         .sterling-premium *, .sterling-premium *::before, .sterling-premium *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
         .sterling-premium video { display: none !important; }
       }
