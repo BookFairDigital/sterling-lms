@@ -2,7 +2,7 @@ import { useState, type FormEvent, type Dispatch, type SetStateAction } from 're
 import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
-  GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings,
+  GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings, House, FilePenLine, UserRound,
   ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck,
 } from 'lucide-react'
 
@@ -62,6 +62,7 @@ const courseImage = (course: Course, settings: Record<string, string>) => {
 }
 export default function PremiumLanding(props: Props) {
   const [mobileMenu, setMobileMenu] = useState(false)
+  const [mobileTab, setMobileTab] = useState('Home')
   const [headlightFailed, setHeadlightFailed] = useState(false)
   const [driveFailed, setDriveFailed] = useState(false)
   const [galleryStart, setGalleryStart] = useState(0)
@@ -86,7 +87,7 @@ export default function PremiumLanding(props: Props) {
     { icon: BadgeCheck, title: 'Recognized Qualifications', sub: 'Explore approved training pathways.' },
   ]
 
-  return <main className="sterling-premium min-h-screen overflow-hidden bg-[#080a0c] text-white">
+  return <main className="sterling-premium min-h-screen overflow-hidden bg-[#080a0c] pb-24 text-white sm:pb-0">
     <div className="border-b border-white/10 bg-black/90 text-[10px] text-neutral-300">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-7">
         <span className="font-semibold tracking-[.16em]">TVEC APPROVED TRAINING CENTRE · REF. P02/0426</span>
@@ -197,6 +198,22 @@ export default function PremiumLanding(props: Props) {
     </div></section>
 
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
+
+    <nav aria-label="Mobile quick navigation" className="fixed inset-x-0 bottom-0 z-[70] grid grid-cols-5 border-t border-white/10 bg-[#121729]/95 px-1 pt-2 shadow-[0_-10px_35px_rgba(0,0,0,.4)] backdrop-blur-xl sm:hidden" style={{paddingBottom:'max(9px, env(safe-area-inset-bottom))'}}>
+      {[
+        {label:'Home',href:'#home',icon:House},
+        {label:'Courses',href:'#courses',icon:GraduationCap},
+        {label:'Locations',href:'#locations',icon:MapPin},
+        {label:'Apply',href:'#apply',icon:FilePenLine},
+      ].map(({label,href,icon:Icon})=><a key={label} href={href} onClick={()=>setMobileTab(label)} aria-current={mobileTab===label?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab===label?'text-[#e34246]':'text-slate-400 hover:text-white')}>
+        <Icon size={27} strokeWidth={mobileTab===label?2.7:2.2} fill={label==='Home'&&mobileTab===label?'currentColor':'none'}/>
+        <span className="text-[11px] font-semibold leading-tight">{label}</span>
+      </a>)}
+      <button type="button" onClick={()=>{setMobileTab('Login');props.onLogin()}} aria-current={mobileTab==='Login'?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab==='Login'?'text-[#e34246]':'text-slate-400 hover:text-white')}>
+        <UserRound size={27} strokeWidth={mobileTab==='Login'?2.7:2.2}/>
+        <span className="text-[11px] font-semibold leading-tight">Login</span>
+      </button>
+    </nav>
     <style>{`
       html { scroll-behavior: smooth; }
       .sterling-premium section { scroll-margin-top: 88px; }
