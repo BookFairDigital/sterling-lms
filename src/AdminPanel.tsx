@@ -119,6 +119,48 @@ function AdminPanel({ onExit, role = 'admin' }: { onExit: () => void; role?: str
     const response=await fetch(API+url,{method,credentials:'include',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined})
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed');return data
   }
+  const addAutomotiveReferenceCourses = async () => {
+    const lecturer = lecturerOptions.find(x => x.status === 'active') || lecturerOptions[0]
+    if (!lecturer?.id) {
+      setError('Add an active lecturer in the Lecturers section first. Published courses require an assigned lecturer.')
+      return
+    }
+    setSavingCourse(true); setError(''); setNotice('')
+    const presets = [
+      { course_code:'AUTO-ELECTRICAL-NVQ4', title:'Certificate Course for Automobile Electrical Technician' },
+      { course_code:'AUTO-TECH-NVQ4', title:'Certificate Course for Automobile Technician' },
+    ]
+    try {
+      for (const preset of presets) {
+        const existing = rows.find(x => String(x.title || '').trim().toLowerCase() === preset.title.toLowerCase())
+        const payload = {
+          course_code: String(existing?.course_code || preset.course_code),
+          title: preset.title,
+          description: String(existing?.description || ''),
+          fee_amount: Number(existing?.fee_amount ?? 75000),
+          currency: String(existing?.currency || 'LKR'),
+          status: 'published',
+          lecturer_id: String(existing?.lecturer_id || lecturer.id),
+          course_type: String(existing?.course_type || 'full_time'),
+          qualification: String(existing?.qualification || 'NVQ Level 4'),
+          duration_months: Number(existing?.duration_months || 24),
+          institutional_months: Number(existing?.institutional_months || 12),
+          on_job_months: Number(existing?.on_job_months || 12),
+          training_locations: String(existing?.training_locations || 'Minuwangoda, Galle, Kadawatha, Rathmalana, Nugegoda'),
+          course_plan: String(existing?.course_plan || ''),
+        }
+        if (existing?.id) await request('/api/courses/' + String(existing.id), 'PATCH', payload)
+        else await request('/api/courses', 'POST', payload)
+      }
+      setNotice('Both Automotive NVQ Level 4 courses are now published. Review their fees, lecturer and course details below.')
+      await load('courses')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not add the Automotive courses')
+    } finally {
+      setSavingCourse(false)
+    }
+  }
+
   const removeRecord = async (row:DataRow) => {
     const id=String(row.id||'');if(!id)return
     const label=String(row.full_name||row.title||row.student_name||row.reference||id)
@@ -252,7 +294,7 @@ function AdminPanel({ onExit, role = 'admin' }: { onExit: () => void; role?: str
           <div className="flex items-end"><button disabled={savingEnrollment || enrollmentStudents.length===0 || !enrollmentCourses.some(x=>x.status==='published')} className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white disabled:opacity-50">{savingEnrollment?'Saving…':'Enrol Student'}</button></div>
           {enrollmentStudents.length===0 && <p className="text-xs text-amber-700 sm:col-span-2">Add a student first in Students. Only published courses can be selected.</p>}
         </form>}
-        {section === 'courses' && <div className="flex items-center justify-between border-b p-4"><span className="text-xs text-slate-500">Manage course catalogue</span><button onClick={() => setShowCourseForm(v => !v)} className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">{showCourseForm ? 'Close' : '+ Add Course'}</button></div>}
+        {section === 'courses' && <div className="flex flex-wrap items-center justify-between gap-2 border-b p-4"><span className="text-xs text-slate-500">Manage course catalogue</span><div className="flex flex-wrap gap-2"><button disabled={savingCourse} onClick={()=>void addAutomotiveReferenceCourses()} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 disabled:opacity-50">{savingCourse?'Adding courses…':'Add / Activate 2 Automotive Courses'}</button><button onClick={() => setShowCourseForm(v => !v)} className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">{showCourseForm ? 'Close' : '+ Add Course'}</button></div></div>}
         {section === 'courses' && showCourseForm && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e => { e.preventDefault(); setSavingCourse(true); setError(''); setNotice(''); try { const r=await fetch(API+'/api/courses',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...courseForm,fee_amount:Number(courseForm.fee_amount),currency:'LKR'})}); const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Could not create course'); setNotice('Course created: '+d.course.course_code+' · '+d.course.title); setCourseForm({course_code:'',title:'',description:'',fee_amount:'0',status:'draft',lecturer_id:'',course_type:'full_time',qualification:'NVQ Level 4',duration_months:'24',institutional_months:'12',on_job_months:'12',training_locations:'',course_plan:''}); setShowCourseForm(false); await load('courses') } catch(e) { setError(e instanceof Error ? e.message : 'Could not create course') } finally { setSavingCourse(false) } }}>
           <label className="text-xs font-semibold text-slate-600">Course code<input required value={courseForm.course_code} onChange={e=>setCourseForm(v=>({...v,course_code:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
           <label className="text-xs font-semibold text-slate-600">Course title<input required value={courseForm.title} onChange={e=>setCourseForm(v=>({...v,title:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
