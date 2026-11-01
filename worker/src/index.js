@@ -94,6 +94,66 @@ export default {async fetch(req,env){
   if(!student||!course)return json({error:"Choose an active student and a published course"},400,h);
   try{const id=crypto.randomUUID();await env.DB.prepare("INSERT INTO enrollments(id,student_id,course_id,status) VALUES(?,?,?,?)").bind(id,studentId,courseId,status).run();return json({ok:true,id},201,h);}catch(e){if(String(e?.message||e).toLowerCase().includes("unique"))return json({error:"This student is already enrolled in that course"},409,h);throw e;}
  }
+
+ if(u.role==="student"&&path==="/api/student/assignments"&&req.method==="GET"){
+  const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.due_at,a.created_at,c.title course_title,c.course_code,s.id submission_id,s.submitted_at,s.grade,s.feedback,CASE WHEN s.id IS NOT NULL THEN 'submitted' WHEN a.due_at IS NOT NULL AND a.due_at<datetime('now') THEN 'overdue' ELSE 'pending' END status FROM assignments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' JOIN courses c ON c.id=a.course_id LEFT JOIN submissions s ON s.assignment_id=a.id AND s.student_id=? ORDER BY CASE WHEN a.due_at IS NULL THEN 1 ELSE 0 END,a.due_at ASC").bind(u.id,u.id).all();
+  return json(rows.results||[],200,h);
+ }
+ if(u.role==="student"&&path.startsWith("/api/student/assignments/")&&path.endsWith("/submit")&&req.method==="POST"){
+  const id=path.split("/")[4],form=await req.formData(),file=form.get("file");
+  if(!(file instanceof File))return json({error:"Choose a file to submit"},400,h);
+  if(file.size>10*1024*1024)return json({error:"Submission must be 10 MB or smaller"},413,h);
+  const allowed=["application/pdf","image/jpeg","image/png","application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  if(!allowed.includes(file.type))return json({error:"Allowed formats: PDF, JPG, PNG and DOCX"},400,h);
+  const assignment=await env.DB.prepare("SELECT a.id,a.due_at FROM assignments a JOIN enrollments e ON e.course_id=a.course_id WHERE a.id=? AND e.student_id=? AND e.status='active'").bind(id,u.id).first();
+  if(!assignment)return json({error:"Assignment not found or you are not enrolled"},404,h);
+  if(assignment.due_at&&new Date(assignment.due_at).getTime()<Date.now())return json({error:"The submission deadline has passed"},409,h);
+  const existing=await env.DB.prepare("SELECT id,file_key FROM submissions WHERE assignment_id=? AND student_id=?").bind(id,u.id).first();
+  const submissionId=existing?.id||crypto.randomUUID(),key="assignment-submissions/"+submissionId+"/"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+  await env.FILES.put(key,file.stream(),{httpMetadata:{contentType:file.type}});
+  try{
+   if(existing)await env.DB.prepare("UPDATE submissions SET file_key=?,submitted_at=CURRENT_TIMESTAMP WHERE id=?").bind(key,submissionId).run();
+   else await env.DB.prepare("INSERT INTO submissions(id,assignment_id,student_id,file_key) VALUES(?,?,?,?)").bind(submissionId,id,u.id,key).run();
+  }catch(e){await env.FILES.delete(key);throw e;}
+  if(existing?.file_key&&existing.file_key!==key)await env.FILES.delete(existing.file_key);
+  return json({ok:true,id:submissionId,status:"submitted"},201,h);
+ }
+ if(path==="/api/assignments"&&req.method==="GET"){
+  if(!["admin","lecturer"].includes(u.role))return json({error:"Access denied"},403,h);
+  const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.due_at,a.created_at,c.course_code,c.title course_title,(SELECT COUNT(*) FROM submissions s WHERE s.assignment_id=a.id) submission_count FROM assignments a LEFT JOIN courses c ON c.id=a.course_id ORDER BY a.created_at DESC").all();
+  return json(rows.results||[],200,h);
+ }
+ if(path==="/api/assignments"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),courseId=String(b?.course_id||""),title=String(b?.title||"").trim(),description=String(b?.description||"").trim(),dueAt=String(b?.due_at||"").trim();
+  if(!courseId||!title)return json({error:"Course and assignment title are required"},400,h);
+  if(title.length>180||description.length>5000)return json({error:"Title must be 180 characters or less and description 5,000 characters or less"},400,h);
+  const course=await env.DB.prepare("SELECT id FROM courses WHERE id=? AND status='published'").bind(courseId).first();
+  if(!course)return json({error:"Choose a published course"},400,h);
+  const id=crypto.randomUUID();
+  await env.DB.prepare("INSERT INTO assignments(id,course_id,title,description,due_at,created_by) VALUES(?,?,?,?,?,?)").bind(id,courseId,title,description||null,dueAt||null,u.id).run();
+  return json({ok:true,id},201,h);
+ }
+ if(path.startsWith("/api/assignments/")&&path.endsWith("/submissions")&&req.method==="GET"){
+  if(!["admin","lecturer"].includes(u.role))return json({error:"Access denied"},403,h);
+  const id=path.split("/")[3],rows=await env.DB.prepare("SELECT s.id,s.student_id,s.submitted_at,s.grade,s.feedback,s.file_key,u.student_number,u.full_name student_name,u.email FROM submissions s JOIN users u ON u.id=s.student_id WHERE s.assignment_id=? ORDER BY s.submitted_at DESC").bind(id).all();
+  return json(rows.results||[],200,h);
+ }
+ if(path.startsWith("/api/assignments/")&&path.endsWith("/grade")&&req.method==="POST"){
+  if(!["admin","lecturer"].includes(u.role))return json({error:"Access denied"},403,h);
+  const id=path.split("/")[3],b=await getBody(req),submissionId=String(b?.submission_id||""),grade=Number(b?.grade),feedback=String(b?.feedback||"").trim();
+  if(!submissionId||!Number.isFinite(grade)||grade<0||grade>100)return json({error:"Submission and a grade from 0 to 100 are required"},400,h);
+  const result=await env.DB.prepare("UPDATE submissions SET grade=?,feedback=? WHERE id=? AND assignment_id=?").bind(grade,feedback||null,submissionId,id).run();
+  if(!result.meta?.changes)return json({error:"Submission not found"},404,h);
+  return json({ok:true},200,h);
+ }
+ if(path.startsWith("/api/assignments/")&&path.endsWith("/download")&&req.method==="GET"){
+  if(!["admin","lecturer"].includes(u.role))return json({error:"Access denied"},403,h);
+  const id=path.split("/")[3],row=await env.DB.prepare("SELECT file_key FROM submissions WHERE id=?").bind(id).first();
+  if(!row)return json({error:"Submission not found"},404,h);
+  const obj=await env.FILES.get(row.file_key);if(!obj)return json({error:"File not found"},404,h);
+  return new Response(obj.body,{status:200,headers:{...h,"content-type":obj.httpMetadata?.contentType||"application/octet-stream","content-disposition":"attachment","cache-control":"private, no-store"}});
+ }
  if(path==="/api/materials"&&req.method==="GET"){
   if(u.role!=="admin"&&u.role!=="lecturer")return json({error:"Access denied"},403,h);
   const rows=await env.DB.prepare("SELECT m.id,m.title,m.file_key,m.file_type,m.file_size,m.created_at,c.course_code,c.title AS course_title FROM learning_materials m LEFT JOIN courses c ON c.id=m.course_id ORDER BY m.created_at DESC").all();
