@@ -157,7 +157,34 @@ function App() {
 
   if (!loggedIn) return <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#061b33] via-[#0b3a66] to-blue-600 p-4">
     <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl md:grid-cols-2">
-      <div className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-[#082544] p-10 text-white md:flex"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1000&q=85" alt="Automotive workshop" className="absolute inset-0 h-full w-full object-cover opacity-25"/><div className="absolute inset-0 bg-gradient-to-br from-[#061b33]/90 to-blue-900/60"/><div className="relative"><BrandLogo className="max-w-[250px] rounded-lg bg-white p-2"/><h1 className="mt-20 text-4xl font-extrabold leading-tight">Your Learning Journey Starts Here.</h1><p className="mt-5 max-w-sm text-sm leading-7 text-blue-100">Access your courses, lessons, assignments, attendance and payments from one student portal.</p></div><p className="relative text-xs text-blue-200">TVEC Approved Training Centre · Student Learning Portal</p></div>
+      <div className="relative hidden min-h-[560px] flex-col justify-between overflow-hidden bg-[#082544] p-10 text-white md:flex"><img src="https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1000&q=85" alt="Automotive workshop" className="absolute inset-0 h-full w-full object-cover opacity-25"/><div className="absolute inset-0 bg-gradient-to-br from-[#061b33]/90 to-blue-900/60"/><div className="relative"><BrandLogo className="max-w-[250px] rounded-lg bg-white p-2"/><h1 className="mt-20 text-4xl font-extrabold leading-tight">Your Learning Journey Starts Here.</h1><p className="mt-5 max-w-sm text-sm leading-7 text-blue-100">Access your courses, lessons, assignments, attendance and payments from one student portal.</p>
+          <div className="mt-7 w-full max-w-[330px]" aria-hidden="true">
+            <svg viewBox="0 0 340 170" className="h-auto w-full overflow-visible">
+              <defs><linearGradient id="garageCar" x1="0" x2="1"><stop offset="0" stopColor="#60a5fa"/><stop offset="1" stopColor="#bfdbfe"/></linearGradient></defs>
+              <path d="M20 143H320" stroke="#93c5fd" strokeOpacity=".45" strokeWidth="2" strokeLinecap="round"/>
+              <g className="garage-lift"><path d="M45 129V90M295 129V90" stroke="#94a3b8" strokeWidth="5" strokeLinecap="round"/><path d="M36 92H304" stroke="#cbd5e1" strokeWidth="4" strokeLinecap="round"/></g>
+              <g transform="translate(30 0)">
+                <path d="M26 111L40 83Q45 73 59 70L91 45Q98 39 110 39H194Q207 39 215 50L238 80L267 91Q276 95 276 106V123H25Z" fill="url(#garageCar)" stroke="#e0f2fe" strokeWidth="3"/>
+                <path d="M99 48H190Q198 48 204 57L220 78H76Z" fill="#12365b" stroke="#bfdbfe" strokeWidth="2"/>
+                <path d="M31 97H268" stroke="#fff" strokeOpacity=".55" strokeWidth="2"/>
+                <g className="garage-wheel" transform="translate(76 122)"><circle r="20" fill="#0b1728" stroke="#cbd5e1" strokeWidth="4"/><circle r="8" fill="#94a3b8"/><path d="M0-15V-8M15 0H8M0 15V8M-15 0H-8" stroke="#e2e8f0" strokeWidth="3"/></g>
+                <g className="garage-wheel" transform="translate(229 122)"><circle r="20" fill="#0b1728" stroke="#cbd5e1" strokeWidth="4"/><circle r="8" fill="#94a3b8"/><path d="M0-15V-8M15 0H8M0 15V8M-15 0H-8" stroke="#e2e8f0" strokeWidth="3"/></g>
+                <path d="M263 91L274 99V108H260" fill="#fbbf24"/><path d="M28 96L18 104V112H31" fill="#fbbf24"/>
+              </g>
+              <g transform="translate(238 18)">
+                <circle cx="26" cy="20" r="12" fill="#f4c7a1" stroke="#fff" strokeWidth="2"/>
+                <path d="M14 17Q16 2 30 7L38 15Z" fill="#fbbf24"/>
+                <path d="M14 34Q26 28 38 36L48 79H5Z" fill="#f97316" stroke="#fed7aa" strokeWidth="2"/>
+                <path d="M14 42L-1 66L12 76" fill="none" stroke="#f4c7a1" strokeWidth="8" strokeLinecap="round" className="garage-arm"/>
+                <path d="M39 42L53 59L41 72" fill="none" stroke="#f4c7a1" strokeWidth="8" strokeLinecap="round"/>
+                <path d="M15 78L8 111M37 78L45 111" stroke="#1e293b" strokeWidth="9" strokeLinecap="round"/>
+                <path d="M2 112H15M40 112H53" stroke="#e2e8f0" strokeWidth="6" strokeLinecap="round"/>
+                <path d="M-7 68L-17 58L-22 65L-12 76" fill="none" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round"/>
+                <g className="garage-spark" fill="#fde047"><path d="M-28 47L-25 56L-16 59L-25 62L-28 71L-31 62L-40 59L-31 56Z"/><circle cx="-7" cy="40" r="3"/></g>
+              </g>
+              <style>{`.garage-wheel{transform-box:fill-box;transform-origin:center;animation:garage-spin 2.8s linear infinite}.garage-arm{transform-origin:15px 42px;animation:garage-fix .9s ease-in-out infinite alternate}.garage-spark{animation:garage-flash .65s ease-in-out infinite alternate}.garage-lift{animation:garage-lift 2.5s ease-in-out infinite alternate}@keyframes garage-spin{to{rotate:360deg}}@keyframes garage-fix{to{rotate:-18deg}}@keyframes garage-flash{from{opacity:.25;scale:.7}to{opacity:1;scale:1.15}}@keyframes garage-lift{to{translate:0 -3px}}@media(prefers-reduced-motion:reduce){.garage-wheel,.garage-arm,.garage-spark,.garage-lift{animation:none}}`}</style>
+            </svg>
+          </div></div><p className="relative text-xs text-blue-200">TVEC Approved Training Centre · Student Learning Portal</p></div>
       <form onSubmit={signIn} className="flex flex-col justify-center p-7 sm:p-12"><BrandLogo className="mb-6 max-w-[220px]"/><p className="text-xs font-bold tracking-[.2em] text-blue-600">STUDENT PORTAL</p><h2 className="mt-3 text-3xl font-extrabold">Welcome Back!</h2><p className="mt-2 text-sm text-slate-500">Sign in to continue your learning journey.</p>
         {error && <p className="mt-5 rounded-lg bg-red-50 p-3 text-xs text-red-700">{error}</p>}
         <label className="mb-2 mt-7 text-xs font-bold">Student Email / ID</label><input value={studentId} onChange={e=>setStudentId(e.target.value)} placeholder="Enter your student email or ID" className="rounded-lg border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500" />
