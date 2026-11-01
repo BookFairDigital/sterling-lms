@@ -13,7 +13,9 @@ type Course = {
   short_description?: string
   qualification?: string
   course_type?: string
-  duration_days?: number
+  duration_months?: number
+  institutional_months?: number
+  on_job_months?: number
   image_url?: string
   thumbnail_url?: string
   [key: string]: any
