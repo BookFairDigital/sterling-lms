@@ -133,6 +133,7 @@ function AdminPanel({ onExit, role = 'admin' }: { onExit: () => void; role?: str
     try {
       for (const preset of presets) {
         const existing = rows.find(x => String(x.title || '').trim().toLowerCase() === preset.title.toLowerCase())
+        const assignedLecturer = lecturerOptions.find(x => String(x.id) === String(existing?.lecturer_id || '') && x.status === 'active') || lecturer
         const payload = {
           course_code: String(existing?.course_code || preset.course_code),
           title: preset.title,
@@ -140,7 +141,7 @@ function AdminPanel({ onExit, role = 'admin' }: { onExit: () => void; role?: str
           fee_amount: Number(existing?.fee_amount ?? 75000),
           currency: String(existing?.currency || 'LKR'),
           status: 'published',
-          lecturer_id: String(existing?.lecturer_id || lecturer.id),
+          lecturer_id: String(assignedLecturer.id),
           course_type: String(existing?.course_type || 'full_time'),
           qualification: String(existing?.qualification || 'NVQ Level 4'),
           duration_months: Number(existing?.duration_months || 24),
