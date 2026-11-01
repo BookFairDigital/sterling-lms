@@ -3,7 +3,7 @@ import AdminPanel from './AdminPanel'
 import BrandLogo from './BrandLogo'
 import {
   Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
-  FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
+  FileText, LayoutDashboard, LogOut, Menu,
   MessageSquare, Search, Settings, Users, Video, Wallet, X,
   ChevronRight, Download, BookMarked,
 } from 'lucide-react'
