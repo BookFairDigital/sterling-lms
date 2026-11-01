@@ -26,3 +26,57 @@ button { cursor: pointer; }
   .sterling-home .sterling-reveal, .sterling-home .sterling-reveal.is-visible { opacity: 1; transform: none; transition: none; }
   .sterling-home * { scroll-behavior: auto !important; animation-duration: .01ms !important; }
 }
+
+
+/* Horizontal swipe cards for the homepage trust and achievement strips. */
+.sterling-home .sterling-side-swipe {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 3px 2px 8px;
+}
+.sterling-home .sterling-side-swipe::-webkit-scrollbar { display: none; }
+.sterling-home .sterling-side-swipe > * { scroll-snap-align: start; }
+.sterling-home .sterling-info-card,
+.sterling-home .sterling-stat-card {
+  display: flex;
+  flex: 0 0 82%;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #e4ebf5;
+  border-radius: 15px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 5px 18px rgb(15  forty 80 / 5%);
+}
+.sterling-home .sterling-info-icon,
+.sterling-home .sterling-stat-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  border: 1px solid #dce8ff;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #f1f6ff, #e7efff);
+  color: #1749d1;
+}
+.sterling-home .sterling-stat-card { flex-basis: 66%; }
+.sterling-home .sterling-stat-icon { width: 46px; height: 46px; flex-basis: 46px; }
+@media (min-width: 640px) {
+  .sterling-home .sterling-side-swipe { gap: 14px; }
+  .sterling-home .sterling-info-card,
+  .sterling-home .sterling-stat-card { flex: 1 0 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sterling-home .sterling-info-card,
+  .sterling-home .sterling-stat-card { transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease; }
+  .sterling-home .sterling-info-card:hover,
+  .sterling-home .sterling-stat-card:hover { border-color: #c7d8ff; box-shadow: 0 9px 24px rgb(20 55 120 / 9%); transform: translateY(-2px); }
+}
