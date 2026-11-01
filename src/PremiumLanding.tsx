@@ -111,12 +111,12 @@ export default function PremiumLanding(props: Props) {
 
     <section id="home" className="relative isolate flex min-h-[590px] items-center overflow-hidden sm:min-h-[650px]">
       {!heroFailed
-        ? <video src={heroVideo} autoPlay muted loop playsInline preload="auto" onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="absolute inset-0 -z-20 h-full w-full object-cover object-center"/>
-        : <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="absolute inset-0 -z-20 h-full w-full object-cover object-center"/>}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/85 to-black/15"/>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#080a0c] via-transparent to-black/20"/>
+        ? <video src={heroVideo} autoPlay muted defaultMuted loop playsInline preload="auto" disablePictureInPicture onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>
+        : <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>}
+      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black via-black/70 to-black/15"/>
+      <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#080a0c] via-transparent to-black/20"/>
       
-      <div className="mx-auto grid w-full max-w-[1440px] items-center gap-8 px-6 py-20 sm:px-10 lg:grid-cols-[.95fr_1.05fr]">
+      <div className="relative z-20 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-6 py-20 sm:px-10 lg:grid-cols-[.95fr_1.05fr]">
         <div className="max-w-[690px]">
           <p className="mb-5 text-[10px] font-black uppercase tracking-[.35em] text-red-400 sm:text-xs">Sterling Training Centre</p>
           <h1 className="max-w-[700px] text-4xl font-black italic leading-[.98] tracking-tight sm:text-6xl lg:text-[72px]">BUILD YOUR FUTURE IN THE <span className="text-red-500">AUTOMOTIVE INDUSTRY</span></h1>
