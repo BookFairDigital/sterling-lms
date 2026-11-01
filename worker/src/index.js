@@ -294,6 +294,29 @@ export default {async fetch(req,env){
   const obj=await env.FILES.get(row.receipt_key);if(!obj)return json({error:"Receipt file missing"},404,h);
   return new Response(obj.body,{status:200,headers:{...h,"content-type":obj.httpMetadata?.contentType||"application/octet-stream","content-disposition":"inline","cache-control":"private, no-store"}});
  }
+
+ if(path==="/api/assessments"&&req.method==="GET"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const rows=await env.DB.prepare("SELECT a.*,c.course_code,c.title course_title,(SELECT COUNT(*) FROM assessment_questions q WHERE q.assessment_id=a.id) question_count FROM assessments a LEFT JOIN courses c ON c.id=a.course_id ORDER BY a.created_at DESC").all();
+  return json(rows.results||[],200,h);
+ }
+ if(path==="/api/assessments"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),course=String(b?.course_id||""),title=String(b?.title||"").trim(),description=String(b?.description||""),duration=Number(b?.duration_minutes||30),pass=Number(b?.pass_mark||0),questions=Array.isArray(b?.questions)?b.questions:[];
+  if(!course||!title||!Number.isInteger(duration)||duration<1||duration>300||questions.length<1||questions.length>100)return json({error:"Enter a title, course, duration and 1–100 questions"},400,h);
+  const cr=await env.DB.prepare("SELECT id FROM courses WHERE id=?").bind(course).first();if(!cr)return json({error:"Course not found"},404,h);
+  let total=0;const valid=[];
+  for(const q of questions){const question=String(q.question||"").trim(),opts=[q.option_a,q.option_b,q.option_c,q.option_d].map(x=>String(x||"").trim()),correct=String(q.correct_option||"").toLowerCase(),marks=Number(q.marks||1);if(!question||!opts[0]||!opts[1]||!["a","b","c","d"].includes(correct)||!opts[["a","b","c","d"].indexOf(correct)]||!Number.isInteger(marks)||marks<1)return json({error:"Each question needs text, at least two options, a correct answer and positive marks"},400,h);valid.push({question,opts,correct,marks});total+=marks;}
+  if(!Number.isInteger(pass)||pass<0||pass>total)return json({error:"Pass mark must be between 0 and total marks"},400,h);
+  const id=crypto.randomUUID();await env.DB.prepare("INSERT INTO assessments(id,course_id,title,description,duration_minutes,total_marks,pass_mark,status,created_by) VALUES(?,?,?,?,?,?,?,'published',?)").bind(id,course,title,description,duration,total,pass,u.id).run();
+  await env.DB.batch(valid.map(q=>env.DB.prepare("INSERT INTO assessment_questions(id,assessment_id,question,option_a,option_b,option_c,option_d,correct_option,marks) VALUES(?,?,?,?,?,?,?,?,?)").bind(crypto.randomUUID(),id,q.question,q.opts[0],q.opts[1],q.opts[2]||null,q.opts[3]||null,q.correct,q.marks)));
+  return json({ok:true,id,total_marks:total,question_count:valid.length},201,h);
+ }
+ if(path==="/api/student/assessments"&&req.method==="GET"){
+  if(u.role!=="student")return json({error:"Student access required"},403,h);
+  const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.duration_minutes,a.total_marks,a.pass_mark,c.course_code,c.title course_title,(SELECT COUNT(*) FROM assessment_questions q WHERE q.assessment_id=a.id) question_count FROM assessments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' JOIN courses c ON c.id=a.course_id WHERE a.status='published' ORDER BY a.created_at DESC").bind(u.id).all();
+  return json(rows.results||[],200,h);
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
