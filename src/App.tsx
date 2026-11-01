@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import AdminPanel from './AdminPanel'
+import PremiumLanding from './PremiumLanding'
 import BrandLogo from './BrandLogo'
 import {
   Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
   FileText, LayoutDashboard, LogOut, Menu,
   Search, Settings, Users, Video, Wallet, X,
-  ChevronRight, Download, BookMarked, Award, Layers, MapPin,
-  ShieldCheck, Building2, BriefcaseBusiness, MapPinned, GraduationCap, Wrench, TrendingUp, Home, UserRound,
+  ChevronRight, Download, BookMarked,
 } from 'lucide-react'
 
 const nav = [
@@ -71,8 +71,6 @@ function App() {
   const [showLogin,setShowLogin]=useState(false)
   const [publicCourses,setPublicCourses]=useState<any[]>([])
   const [publicGallery,setPublicGallery]=useState<any[]>([])
-  const [galleryIndex,setGalleryIndex]=useState(0)
-  const [showAllCourses,setShowAllCourses]=useState(false)
   const [publicSettings,setPublicSettings]=useState<Record<string,string>>({})
   const [applicationForm,setApplicationForm]=useState({full_name:'',email:'',phone:'',nic:'',address:'',course_id:'',qualifications:'',message:''})
   const [applicationNotice,setApplicationNotice]=useState('')
@@ -179,145 +177,23 @@ function App() {
   }
 
 
-  const featuredCourses=publicCourses.filter(c=>/automobile electrical technician|automobile technician/i.test(String(c.title||''))).slice(0,2)
-  useEffect(()=>{if(loggedIn||showLogin)return;const nodes=Array.from(document.querySelectorAll<HTMLElement>('.sterling-home section, .sterling-home footer, .sterling-home section .grid > *, .sterling-home > div > .mx-auto.grid > *'));if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){nodes.forEach(n=>n.classList.add('is-visible'));return}const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:0.08,rootMargin:'0px 0px -40px 0px'});nodes.forEach((n,i)=>{n.classList.add('sterling-reveal');n.style.transitionDelay=`${(i%4)*85}ms`;observer.observe(n)});return()=>observer.disconnect()},[loggedIn,showLogin])
-  const PublicWebsite=()=> <div className="sterling-home min-h-screen bg-white pb-20 text-slate-900 sm:pb-0">
-    <div className="sterling-topbar relative overflow-hidden bg-[#202a34] text-white"><div className="sterling-topbar-content mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-2 px-5 py-2 text-[11px] font-semibold tracking-wide"><span className="sterling-topbar-item">TVEC APPROVED TRAINING CENTRE · REF. P02/0426</span><div className="sterling-topbar-contact flex flex-wrap gap-4"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a></div></div></div>
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur"><div className="mx-auto flex max-w-[960px] items-center justify-between gap-4 px-4 py-3"><a href="#" aria-label="Sterling Training Centre home"><BrandLogo className="w-36 sm:w-44"/></a><nav className="hidden items-center gap-7 text-sm font-bold text-[#202a34] lg:flex"><a className="transition hover:text-red-700" href="#">Home</a><a className="transition hover:text-red-700" href="#courses">Courses</a><a className="transition hover:text-red-700" href="#about">About Us</a><a className="transition hover:text-red-700" href="#accreditation">Accreditation</a><a className="transition hover:text-red-700" href="#gallery">Gallery</a><a className="transition hover:text-red-700" href="#contact">Contact</a></nav><div className="flex items-center gap-2"><button onClick={()=>setShowLogin(true)} className="rounded-lg bg-red-600 px-4 py-3 text-xs font-extrabold text-white shadow-lg shadow-red-900/20 transition hover:bg-red-700 sm:px-5">♙ <span className="ml-1">Student Login</span></button></div></div></header>
-    <section className="sterling-red-hero relative isolate overflow-hidden bg-[#f7f8fa] text-[#202a34]">
-      <div className="absolute inset-0 -z-20 bg-[linear-gradient(115deg,#ffffff_0%,#f5f6f8_58%,#e9edf1_100%)]"/>
-      <div className="absolute inset-y-0 right-0 -z-10 hidden w-[59%] bg-cover bg-center lg:block" style={{backgroundImage:`linear-gradient(90deg,rgba(248,250,252,.06),rgba(32,42,52,.08)),url('${publicSettings.hero_image_url||"https://www.sterling.lk/wp-content/uploads/2024/01/sats-1.png"}')`}}/>
-      {publicSettings.hero_video_url&&<><video src={publicSettings.hero_video_url} autoPlay muted loop playsInline poster={publicSettings.hero_image_url||undefined} aria-label="Sterling automotive training in action" className="absolute inset-y-0 right-0 -z-10 hidden h-full w-[62%] object-cover lg:block"/><div className="absolute inset-y-0 right-0 -z-10 hidden w-[62%] bg-gradient-to-r from-transparent via-[#202a34]/10 to-[#111820]/45 lg:block"/></>}
-      <div className="absolute right-[57%] top-0 hidden h-full w-16 -skew-x-[22deg] bg-red-600 lg:block"/>
-      <div className="mx-auto grid min-h-[570px] max-w-[1280px] items-center gap-8 px-5 py-16 sm:py-20 lg:grid-cols-[.9fr_1.1fr]">
-        <div className="max-w-xl text-[#202a34]">
-          <p className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[.2em] text-red-700"><ShieldCheck size={17}/> TVEC Approved Training Centre</p>
-          <h1 className="mt-5 text-4xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-[4.35rem]">Automotive Training for a <span className="block text-red-600">Successful Career.</span></h1>
-          <p className="mt-5 max-w-lg text-sm leading-7 text-slate-600 sm:text-base">Industry-focused, NVQ recognized training programmes with real workshop experience.</p>
-          <div className="mt-7 flex flex-wrap gap-3"><a href="#courses" className="inline-flex items-center gap-3 rounded-full bg-red-600 px-6 py-3.5 text-xs font-black text-white shadow-lg shadow-red-900/15 transition hover:-translate-y-0.5 hover:bg-red-700">Explore Programmes <span>→</span></a><a href="#gallery" className="inline-flex items-center gap-2 rounded-full border border-slate-400 bg-white px-5 py-3.5 text-xs font-extrabold text-[#202a34] transition hover:border-red-500 hover:text-red-700">Watch Activities <span>↗</span></a></div>
-          <div className="mt-7 grid grid-cols-2 gap-3 text-[11px] font-bold text-slate-700 sm:grid-cols-3"><span className="flex items-center gap-2"><BriefcaseBusiness size={16} className="text-red-600"/> Hands-on Training</span><span className="flex items-center gap-2"><Award size={16} className="text-red-600"/> NVQ Recognition</span><span className="flex items-center gap-2"><Users size={16} className="text-red-600"/> Industry Exposure</span></div>
-        </div>
-        <div className="relative overflow-hidden rounded-2xl border-4 border-white bg-[#202a34] shadow-2xl lg:hidden"><img src={publicSettings.hero_image_url||"https://www.sterling.lk/wp-content/uploads/2024/01/sats-1.png"} alt="Automotive students receiving practical workshop training" className="h-64 w-full object-cover"/>{publicSettings.hero_video_url&&<video src={publicSettings.hero_video_url} autoPlay muted loop playsInline poster={publicSettings.hero_image_url||undefined} className="absolute inset-0 h-full w-full object-cover"/>}</div>
-      </div>
-      <div className="absolute bottom-0 left-0 h-1.5 w-full bg-gradient-to-r from-red-700 via-red-500 to-[#202a34]"/>
-    </section>
-    <section id="accreditation" className="border-b border-slate-200 bg-white py-4 sm:py-6">
-      <div className="mx-auto max-w-[1120px] px-4 sm:px-5">
-        <div className="sterling-side-swipe sterling-accreditation-track">
-          {[{icon:ShieldCheck,title:"TVEC Approved",sub:"Training Centre"},{icon:Building2,title:"Accredited Centre",sub:"Ref. No: P02/0426"},{icon:BriefcaseBusiness,title:"Industry Exposure",sub:"On-the-job training"},{icon:MapPinned,title:"5 Training Locations",sub:"Minuwangoda · Galle · Kadawatha · Rathmalana · Nugegoda"}].map(item=><article key={item.title} className="sterling-info-card">
-            <span className="sterling-info-icon"><item.icon size={23} strokeWidth={1.9}/></span>
-            <span className="min-w-0"><b className="block text-sm font-extrabold text-[#202a34]">{item.title}</b><span className="mt-1 block text-xs leading-5 text-slate-500">{item.sub}</span></span>
-          </article>)}
-        </div>
-      </div>
-    </section>
-    <section aria-label="Sterling achievements" className="border-y border-slate-700 bg-[#202a34] py-3 sm:py-4">
-      <div className="mx-auto max-w-[1120px] px-4 sm:px-5">
-        <div className="sterling-side-swipe sterling-stats-track">
-          {[{icon:Users,value:'10,000+',label:'Trained Students'},{icon:Award,value:'15+',label:'Years of Excellence'},{icon:Layers,value:'2',label:'NVQ Level 4 Programmes'},{icon:MapPin,value:'5',label:'Training Locations'}].map(item=><article key={item.label} className="sterling-stat-card">
-            <span className="sterling-stat-icon"><item.icon size={22} strokeWidth={2}/></span>
-            <span className="min-w-0"><b className="block whitespace-nowrap text-base font-black leading-tight text-white">{item.value}</b><span className="mt-1 block text-[10px] leading-tight text-slate-200">{item.label}</span></span>
-          </article>)}
-        </div>
-      </div>
-    </section>
-    <section id="gallery" className="bg-gradient-to-b from-[#f7f7f7] to-white py-5 sm:py-7">
-      <div className="mx-auto max-w-[1120px] px-3 sm:px-5">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-            <div className="shrink-0"><p className="text-[9px] font-black uppercase tracking-wider text-red-700 sm:text-[10px]">Our Gallery</p><span className="mt-1 block h-0.5 w-6 rounded-full bg-red-600"/></div>
-            <h2 className="truncate text-sm font-black text-[#202a34] sm:text-lg">A Glimpse of Our Activities</h2>
-          </div>
-          <a href="#gallery" className="shrink-0 rounded-md border border-red-600 px-2.5 py-1.5 text-[9px] font-extrabold text-red-700 transition hover:bg-red-600 hover:text-white sm:px-3 sm:text-[10px]">View Full Gallery <span aria-hidden="true">→</span></a>
-        </div>
-        {publicGallery.length===0?<div className="rounded-xl border border-dashed border-red-200 bg-white px-4 py-8 text-center text-xs text-slate-500">Gallery photos will appear here when uploaded by the training centre.</div>:<>
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3">
-              {publicGallery.slice(galleryIndex,galleryIndex+4).map(g=><article key={g.id} className="group relative h-[78px] overflow-hidden rounded-lg bg-[#202a34] shadow-md sm:h-[112px]">
-                <img src={'https://sterling-lms-api.texascampus1.workers.dev/public/gallery/'+g.id} alt={g.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#171e25]/90 via-[#171e25]/10 to-transparent"/>
-                <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3"><b className="block line-clamp-2 text-[9px] font-extrabold leading-tight text-white sm:text-xs">{g.title}</b>{g.description&&<p className="mt-0.5 line-clamp-1 text-[8px] text-slate-200 sm:text-[10px]">{g.description}</p>}</div>
-              </article>)}
-            </div>
-            {publicGallery.length>4&&<><button type="button" aria-label="Previous gallery photos" onClick={()=>setGalleryIndex(i=>Math.max(0,i-1))} disabled={galleryIndex===0} className="absolute -left-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-slate-200 bg-white text-sm font-black text-red-700 shadow-md disabled:opacity-40 sm:-left-3">‹</button><button type="button" aria-label="Next gallery photos" onClick={()=>setGalleryIndex(i=>Math.min(publicGallery.length-4,i+1))} disabled={galleryIndex>=publicGallery.length-4} className="absolute -right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full border border-slate-200 bg-white text-sm font-black text-red-700 shadow-md disabled:opacity-40 sm:-right-3">›</button></>}
-          </div>
-          {publicGallery.length>4&&<div className="mt-2.5 flex justify-center gap-1.5">{Array.from({length:publicGallery.length-3},(_,i)=><button key={i} type="button" aria-label={'Show gallery photos starting at '+(i+1)} onClick={()=>setGalleryIndex(i)} className={`h-1.5 rounded-full transition-all ${galleryIndex===i?'w-4 bg-red-600':'w-1.5 bg-slate-300'}`}/>)}</div>}
-        </>}
-      </div>
-    </section>
-    <section id="courses" className="relative overflow-hidden bg-gradient-to-br from-[#f7f7f7] via-[#ffffff] to-[#f0f0f0] py-7 sm:py-9">
-      <div className="absolute inset-0 opacity-30" style={{backgroundImage:"radial-gradient(#e7b8b8 1px,transparent 1px)",backgroundSize:"20px 20px"}}/>
-      <div className="relative mx-auto max-w-[1120px] px-3 sm:px-5">
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-          <div><p className="text-[9px] font-black uppercase tracking-[.2em] text-red-700 sm:text-[10px]">Our Programmes</p><h2 className="mt-1 text-lg font-black tracking-tight text-[#202a34] sm:text-2xl">Automotive Training Programmes</h2></div>
-          <span className="text-[9px] font-semibold text-slate-500 sm:text-[10px]">TVEC Approved · NVQ Level 4</span>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-          {(showAllCourses?publicCourses:featuredCourses).length===0?<div className="rounded-xl border border-dashed border-red-200 bg-white/80 p-7 text-center text-xs text-slate-500 sm:col-span-2">Course information will be published here soon.</div>:(showAllCourses?publicCourses:featuredCourses).map(c=><article key={c.id} className="group grid min-h-[132px] grid-cols-[39%_1fr] overflow-hidden rounded-xl border border-slate-200/90 bg-white/90 shadow-[0_7px_20px_rgba(13,43,78,.10)] transition duration-300 hover:-translate-y-0.5 hover:shadow-lg sm:grid-cols-[43%_1fr]">
-            <div className="relative min-h-[132px] overflow-hidden bg-[#202a34]">
-              <img src={publicSettings.course_automobile_image_url||"https://www.sterling.lk/wp-content/uploads/2024/01/sats-1.png"} alt={c.title} className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"/>
-              <span className="absolute left-2 top-2 rounded-full bg-red-600 px-2 py-1 text-[8px] font-black text-white sm:left-3 sm:top-3 sm:text-[9px]">{c.course_type==='part_time'?'Part Time':'Full Time'}</span>
-            </div>
-            <div className="flex min-w-0 flex-col justify-center p-2.5 sm:p-3.5">
-              <h3 className="text-[10px] font-black leading-[1.25] text-[#202a34] sm:text-sm">{c.title}</h3>
-              <span className="mt-1.5 w-fit rounded bg-red-50 px-1.5 py-0.5 text-[8px] font-extrabold text-red-900 sm:text-[9px]">{c.qualification||'NVQ Level 4'}</span>
-              <div className="mt-2 space-y-1 text-[8px] leading-tight text-slate-600 sm:text-[10px]">
-                <p className="flex items-center gap-1.5"><span className="text-red-700">▦</span><span>Duration: {Math.round((c.duration_months||24)/12)} Years</span></p>
-                <p className="flex items-center gap-1.5"><span className="text-red-700">♙</span><span>{Math.round((c.institutional_months||12)/12)} Year Institutional Training</span></p>
-                <p className="flex items-center gap-1.5"><span className="text-red-700">⚒</span><span>{Math.round((c.on_job_months||12)/12)} Year On-the-Job Training</span></p>
-              </div>
-              <button type="button" onClick={()=>{setApplicationForm(v=>({...v,course_id:c.id}));document.getElementById('apply')?.scrollIntoView({behavior:'smooth'})}} className="mt-2 w-fit text-[9px] font-black text-red-700 hover:text-red-600 sm:text-[10px]">View Details <span aria-hidden="true">→</span></button>
-            </div>
-          </article>)}
-        </div>
-        <div className="mt-4 text-center"><button type="button" onClick={()=>setShowAllCourses(v=>!v)} className="rounded-lg border border-red-600 bg-white/70 px-5 py-2 text-[9px] font-extrabold text-red-700 shadow-sm transition hover:bg-red-600 hover:text-white sm:text-[10px]">{showAllCourses?'Show Featured Courses':'View All Courses'} <span aria-hidden="true">→</span></button></div>
-      </div>
-    </section>
-    <section id="about" className="bg-[#f7f8fa] px-4 py-5 sm:px-5 sm:py-7">
-      <div className="mx-auto grid max-w-[1120px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,.08)] lg:grid-cols-[1.18fr_repeat(4,1fr)]">
-        <div className="relative flex min-h-[126px] flex-col justify-center overflow-hidden bg-[#202a34] px-7 py-5 text-white sm:px-9">
-          <div className="absolute -right-5 top-0 h-full w-12 skew-x-[-24deg] bg-red-600"/>
-          <p className="text-[9px] font-black uppercase tracking-[.22em] text-slate-300">Why choose us?</p>
-          <h2 className="mt-2 max-w-[210px] text-2xl font-black leading-[1.05] sm:text-[27px]">The Sterling <span className="text-red-500">Advantage</span></h2>
-          <p className="mt-2 max-w-[220px] text-[10px] leading-4 text-slate-300">A trusted training centre with industry experience, recognized qualifications, and strong career pathways.</p>
-        </div>
-        {[{icon:GraduationCap,title:'Recognized Qualifications',desc:'NVQ certified programmes'},{icon:Wrench,title:'Practical Training',desc:'Real workshop exposure'},{icon:Users,title:'Experienced Trainers',desc:'Industry professionals'},{icon:TrendingUp,title:'Career Opportunities',desc:'Pathway to employment'}].map((item)=><div key={item.title} className="flex min-h-[118px] flex-col items-center justify-center border-t border-slate-200 px-3 py-4 text-center transition hover:bg-red-50/50 lg:border-l lg:border-t-0">
-          <item.icon size={24} strokeWidth={2.1} className="text-red-600"/>
-          <h3 className="mt-2 max-w-[145px] text-[11px] font-black leading-tight text-[#202a34]">{item.title}</h3>
-          <p className="mt-1 text-[9px] leading-4 text-slate-500">{item.desc}</p>
-        </div>)}
-      </div>
-    </section>
-    <section id="locations" className="relative overflow-hidden bg-white px-4 py-7 sm:px-5 sm:py-9">
-      <div className="pointer-events-none absolute inset-0 opacity-60" style={{backgroundImage:'linear-gradient(135deg,transparent 0 48%,#f5f6f8 48.2%,transparent 48.6%),linear-gradient(315deg,transparent 0 72%,#f8f8f9 72.2%,transparent 72.6%)'}}/>
-      <div className="relative mx-auto max-w-[1120px]">
-        <div className="text-center">
-          <p className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[.2em] text-red-600"><span className="h-px w-6 bg-red-500"/>Our Locations<span className="h-px w-6 bg-red-500"/></p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#202a34] sm:text-[30px]">Training <span className="text-red-600">Locations</span></h2>
-          <p className="mt-1 text-[11px] text-slate-500">Learn at a Sterling centre near you.</p>
-        </div>
-        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {[
-            {name:'Minuwangoda',key:'location_minuwangoda_image_url',fallback:'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=700&q=85'},
-            {name:'Galle',key:'location_galle_image_url',fallback:'https://images.unsplash.com/photo-1625047509248-ec889cbff17f?auto=format&fit=crop&w=700&q=85'},
-            {name:'Kadawatha',key:'location_kadawatha_image_url',fallback:'https://www.sterling.lk/wp-content/uploads/2024/01/banner_07-1.jpg'},
-            {name:'Rathmalana',key:'location_rathmalana_image_url',fallback:'https://images.unsplash.com/photo-1632823471565-1ecdf5c7a3f1?auto=format&fit=crop&w=700&q=85'},
-            {name:'Nugegoda',key:'location_nugegoda_image_url',fallback:'https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=700&q=85'}
-          ].map(location=><a key={location.name} href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Sterling Aftercare Centre '+location.name+' Sri Lanka')} target="_blank" rel="noreferrer" className="group relative h-[112px] overflow-hidden rounded-xl bg-[#202a34] shadow-[0_7px_18px_rgba(15,23,42,.16)] transition duration-300 hover:-translate-y-1 hover:shadow-xl sm:h-[126px]">
-            <img src={publicSettings[location.key]||location.fallback} alt={'Sterling training location '+location.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-110"/>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#111820]/95 via-[#111820]/15 to-transparent"/>
-            <div className="absolute bottom-0 left-0 right-0 flex items-center gap-1.5 p-3 text-white"><MapPin size={15} fill="#dc2626" strokeWidth={2.5} className="shrink-0 text-white"/><span className="text-[11px] font-extrabold drop-shadow sm:text-xs">{location.name}</span></div>
-          </a>)}
-        </div>
-      </div>
-    </section>
-    <section id="apply" className="bg-[#f4f4f4] py-16"><div className="mx-auto grid max-w-[960px] gap-10 px-5 lg:grid-cols-[.7fr_1.3fr]"><div className="flex flex-col justify-center"><p className="text-xs font-black uppercase tracking-[.22em] text-red-700">Admissions are open</p><h2 className="mt-3 text-3xl font-black leading-tight text-[#202a34] sm:text-4xl">Take the first step towards your automotive career.</h2><p className="mt-4 text-sm leading-7 text-slate-600">Submit your details and our admissions team will review your application and contact you.</p><div className="mt-6 rounded-xl bg-[#202a34] p-5 text-white"><b className="text-sm">Need help?</b><a href="tel:+94117600800" className="mt-2 block text-lg font-black text-red-400">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="mt-1 block text-xs text-slate-200">callcenter@sterling.lk</a></div></div><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_15px_45px_rgba(13,43,78,.08)] sm:p-8"><h3 className="text-xl font-black text-[#202a34]">Enrollment Application</h3><p className="mt-1 text-xs text-slate-500">Complete the form below to apply for a course.</p>{applicationNotice&&<p className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">{applicationNotice}</p>}{applicationError&&<p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{applicationError}</p>}<form onSubmit={submitApplication} className="mt-5 grid gap-4 sm:grid-cols-2"><label className="text-xs font-bold text-slate-700">Full name<input required value={applicationForm.full_name} onChange={e=>setApplicationForm(v=>({...v,full_name:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-red-500"/></label><label className="text-xs font-bold text-slate-700">Email address<input required type="email" value={applicationForm.email} onChange={e=>setApplicationForm(v=>({...v,email:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-red-500"/></label><label className="text-xs font-bold text-slate-700">Phone number<input required value={applicationForm.phone} onChange={e=>setApplicationForm(v=>({...v,phone:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-red-500"/></label><label className="text-xs font-bold text-slate-700">NIC (optional)<input value={applicationForm.nic} onChange={e=>setApplicationForm(v=>({...v,nic:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm outline-none focus:border-red-500"/></label><label className="text-xs font-bold text-slate-700 sm:col-span-2">Select course<select required value={applicationForm.course_id} onChange={e=>setApplicationForm(v=>({...v,course_id:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"><option value="">Choose a course</option>{publicCourses.map(c=><option key={c.id} value={c.id}>{c.title}</option>)}</select></label><label className="text-xs font-bold text-slate-700 sm:col-span-2">Address<input value={applicationForm.address} onChange={e=>setApplicationForm(v=>({...v,address:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"/></label><label className="text-xs font-bold text-slate-700 sm:col-span-2">Previous qualifications<textarea value={applicationForm.qualifications} onChange={e=>setApplicationForm(v=>({...v,qualifications:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"/></label><label className="text-xs font-bold text-slate-700 sm:col-span-2">Additional message<textarea value={applicationForm.message} onChange={e=>setApplicationForm(v=>({...v,message:e.target.value}))} className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"/></label><button disabled={applicationBusy||!publicCourses.length} className="rounded-lg bg-red-600 px-5 py-3.5 text-sm font-black text-white shadow-md transition hover:bg-red-700 disabled:opacity-50 sm:col-span-2">{applicationBusy?'Submitting application…':'Submit Application →'}</button></form></div></div></section>
-    <section id="contact" className="bg-[#202a34] py-10 text-white"><div className="mx-auto grid max-w-[960px] items-center gap-8 px-5 md:grid-cols-[1fr_auto]"><div><p className="text-xs font-black uppercase tracking-[.2em] text-red-400">Have a question?</p><h2 className="mt-2 text-2xl font-black sm:text-3xl">Talk to our admissions team.</h2><p className="mt-2 text-sm text-slate-200">We can help with course details, applications and training locations.</p></div><div className="flex flex-wrap items-center gap-3"><a href="tel:+94117600800" className="rounded-lg bg-red-600 px-5 py-3 text-sm font-black text-white">Call +94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="rounded-lg border border-white/40 px-5 py-3 text-sm font-bold text-white">Email Sterling</a></div></div></section>
-    <footer className="bg-[#171e25] px-5 pb-6 pt-12 text-slate-200"><div className="mx-auto grid max-w-[960px] gap-9 sm:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1.2fr_1.2fr]"><div><div className="inline-block rounded-lg bg-white p-2"><BrandLogo className="w-40"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-slate-300">Sterling Training Centre develops practical automotive skills for the next generation of technicians.</p></div><div><b className="text-sm text-white">Quick Links</b><div className="mt-4 grid gap-2 text-xs"><a href="#courses">Courses</a><a href="#about">About Us</a><a href="#accreditation">Accreditation</a><a href="#gallery">Gallery</a><a href="#apply">Apply Now</a></div></div><div><b className="text-sm text-white">Training Locations</b><div className="mt-4 grid gap-2 text-xs">{["Minuwangoda","Galle","Kadawatha","Rathmalana","Nugegoda"].map(x=><span key={x}>⌖ {x}</span>)}</div></div><div><b className="text-sm text-white">Get in Touch</b><div className="mt-4 grid gap-2 text-xs"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="mailto:customercare1@sterling.lk">customercare1@sterling.lk</a><span className="mt-2 text-slate-300">TVEC Approved & Accredited Centre · P02/0426</span></div></div></div><div className="mx-auto mt-10 flex max-w-[960px] flex-wrap justify-between gap-2 border-t border-white/10 pt-5 text-[10px] text-slate-300"><span>© 2026 Sterling Training Centre. All rights reserved.</span><span>Automotive skills · Practical learning · Career pathways</span></div></footer>
-    <nav aria-label="Mobile navigation" className="sterling-mobile-nav fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-white/10 bg-[#111827] px-1 pb-[max(env(safe-area-inset-bottom),8px)] pt-2 text-white shadow-[0_-8px_24px_rgba(15,23,42,.22)] sm:hidden">
-      {[{label:"Home",icon:Home,action:()=>window.scrollTo({top:0,behavior:"smooth"})},{label:"Courses",icon:GraduationCap,action:()=>document.getElementById("courses")?.scrollIntoView({behavior:"smooth"})},{label:"Locations",icon:MapPin,action:()=>document.getElementById("locations")?.scrollIntoView({behavior:"smooth"})},{label:"Apply",icon:FileText,action:()=>document.getElementById("apply")?.scrollIntoView({behavior:"smooth"})},{label:"Login",icon:UserRound,action:()=>setShowLogin(true)}].map((item,i)=>{const Icon=item.icon;return <button key={item.label} type="button" onClick={item.action} className={"flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg py-1.5 text-[10px] font-semibold transition "+(i===0?"text-red-500":"text-slate-300 hover:text-white")}><Icon size={21} strokeWidth={2.3}/><span>{item.label}</span></button>})}
-    </nav>
-  </div>
+  useEffect(()=>{if(loggedIn||showLogin)return;const nodes=Array.from(document.querySelectorAll<HTMLElement>('.sterling-premium section, .sterling-premium footer, .sterling-premium section .grid > *, .sterling-premium > div > .mx-auto.grid > *'));if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){nodes.forEach(n=>n.classList.add('is-visible'));return}const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');observer.unobserve(entry.target)}}),{threshold:0.08,rootMargin:'0px 0px -40px 0px'});nodes.forEach((n,i)=>{n.classList.add('sterling-reveal');n.style.transitionDelay=`${(i%4)*85}ms`;observer.observe(n)});return()=>observer.disconnect()},[loggedIn,showLogin])
+  const PublicWebsite=()=> <PremiumLanding
+    courses={publicCourses}
+    gallery={publicGallery}
+    settings={publicSettings}
+    onLogin={()=>setShowLogin(true)}
+    applicationForm={applicationForm}
+    setApplicationForm={setApplicationForm}
+    applicationNotice={applicationNotice}
+    applicationError={applicationError}
+    applicationBusy={applicationBusy}
+    onApplySubmit={submitApplication}
+    chatForm={chatForm}
+    setChatForm={setChatForm}
+    chatNotice={chatNotice}
+    onChatSubmit={submitChat}
+  />
 
   if (loggedIn && (userRole === 'admin' || userRole === 'lecturer')) return <AdminPanel role={userRole} onExit={async () => { await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout?role=admin', { method: 'POST', credentials: 'include' }); setLoggedIn(false); setUserRole('') }} />
 
