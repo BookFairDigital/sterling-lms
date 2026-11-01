@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import BrandLogo from './BrandLogo'
 import { Activity, BookOpen, CircleDollarSign, LayoutDashboard, LogOut, RefreshCw, Users, Video, Bell, UserPlus, ClipboardList, FileBarChart } from 'lucide-react'
 
-type Section = 'overview' | 'students' | 'courses' | 'enrollments' | 'materials' | 'payments' | 'zoom' | 'announcements' | 'assignments' | 'assessments' | 'reports' | 'lecturers' | 'attendance'
+type Section = 'overview' | 'students' | 'courses' | 'enrollments' | 'materials' | 'payments' | 'zoom' | 'announcements' | 'assignments' | 'assessments' | 'reports' | 'lecturers' | 'attendance' | 'applications' | 'coursePlans' | 'continuous' | 'gallery' | 'chat' | 'siteSettings'
 type DataRow = Record<string, string | number | null>
 const API = 'https://sterling-lms-api.texascampus1.workers.dev'
 const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
@@ -10,6 +10,12 @@ const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] =
   { id: 'students', label: 'Students', icon: Users },
   { id: 'lecturers', label: 'Lecturers', icon: Users },
   { id: 'attendance', label: 'Attendance', icon: ClipboardList },
+  { id: 'applications', label: 'Enrollment Applications', icon: UserPlus },
+  { id: 'coursePlans', label: 'Course Plans', icon: BookOpen },
+  { id: 'continuous', label: 'Assessment Records', icon: FileBarChart },
+  { id: 'gallery', label: 'Gallery', icon: BookOpen },
+  { id: 'chat', label: 'Chat Messages', icon: Bell },
+  { id: 'siteSettings', label: 'Website Settings', icon: CircleDollarSign },
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'enrollments', label: 'Enrollments', icon: UserPlus },
   { id: 'assignments', label: 'Assignments', icon: ClipboardList },
@@ -42,7 +48,7 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const [savingStudent, setSavingStudent] = useState(false)
   const [notice, setNotice] = useState('')
   const [showCourseForm, setShowCourseForm] = useState(false)
-  const [courseForm, setCourseForm] = useState({ course_code: '', title: '', description: '', fee_amount: '0', status: 'draft', lecturer_id: '' })
+  const [courseForm, setCourseForm] = useState({ course_code: '', title: '', description: '', fee_amount: '0', status: 'draft', lecturer_id: '', course_type:'full_time', qualification:'NVQ Level 4', duration_months:'24', institutional_months:'12', on_job_months:'12', training_locations:'', course_plan:'' })
   const [savingCourse, setSavingCourse] = useState(false)
   const [lecturerOptions, setLecturerOptions] = useState<DataRow[]>([])
   const [showLecturerForm, setShowLecturerForm] = useState(false)
@@ -52,6 +58,11 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const [attendanceStudents, setAttendanceStudents] = useState<DataRow[]>([])
   const [attendanceForm, setAttendanceForm] = useState({course_id:'',student_id:'',class_date:new Date().toISOString().slice(0,10),status:'present'})
   const [savingAttendance, setSavingAttendance] = useState(false)
+  const [planForm,setPlanForm]=useState({course_id:'',title:'',description:'',plan_order:'1',start_month:'1',end_month:'3'})
+  const [continuousForm,setContinuousForm]=useState({course_id:'',student_id:'',title:'',assessment_type:'practical',score:'',max_score:'100',feedback:''})
+  const [galleryForm,setGalleryForm]=useState({title:'',description:'',category:'csr'})
+  const [galleryFile,setGalleryFile]=useState<File|null>(null)
+  const [siteSettings,setSiteSettings]=useState({payment_qr_url:'',bank_details:'',whatsapp_number:'',contact_phone:'',contact_email:'',centre_accreditation:'TVEC Approved Training Centre · P02/0426'})
   const [enrollmentStudents, setEnrollmentStudents] = useState<DataRow[]>([])
   const [enrollmentCourses, setEnrollmentCourses] = useState<DataRow[]>([])
   const [enrollmentForm, setEnrollmentForm] = useState({ student_id: '', course_id: '', status: 'active' })
@@ -77,7 +88,7 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
   const load = useCallback(async (target: Section = section) => {
     setLoading(true); setError('')
     try {
-      const path = target === 'overview' ? '/api/dashboard' : target === 'reports' ? '/api/reports' : target === 'zoom' ? '/api/zoom-classes' : '/api/' + target
+      const path = target === 'overview' ? '/api/dashboard' : target === 'reports' ? '/api/reports' : target === 'zoom' ? '/api/zoom-classes' : target === 'coursePlans' ? '/api/course-plans' : target === 'continuous' ? '/api/continuous-assessments' : target === 'applications' ? '/api/enrollment-applications' : target === 'siteSettings' ? '/public/settings' : '/api/' + target
       const response = await fetch(API + path, { credentials: 'include' })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Could not load live data')
@@ -88,7 +99,10 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
     finally { setLoading(false) }
   }, [section])
   useEffect(() => { void load(section) }, [section, load])
-  useEffect(() => { if (section === 'courses' || section === 'lecturers') fetch(API+'/api/lecturers',{credentials:'include'}).then(r=>r.json()).then(d=>setLecturerOptions(Array.isArray(d)?d:[])).catch(()=>setError('Could not load lecturers')) }, [section])
+  useEffect(() => { if(section==='siteSettings')fetch(API+'/public/settings').then(r=>r.json()).then(d=>setSiteSettings(v=>({...v,...d}))).catch(()=>setError('Could not load website settings')) },[section])
+  useEffect(() => { if (section === 'courses' || section === 'lecturers' || section === 'coursePlans' || section === 'continuous')  fetch(API+'/api/lecturers',{credentials:'include'}).then(r=>r.json()).then(d=>setLecturerOptions(Array.isArray(d)?d:[])).catch(()=>setError('Could not load lecturers')) }, [section])
+  useEffect(() => { if (section === 'coursePlans' || section === 'continuous' || section === 'gallery') fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setAssignmentCourses(Array.isArray(d)?d.filter((x:DataRow)=>x.status==='published'):[])).catch(()=>setError('Could not load courses')) },[section])
+  useEffect(() => { if (section === 'continuous') fetch(API+'/api/students',{credentials:'include'}).then(r=>r.json()).then(d=>setAttendanceStudents(Array.isArray(d)?d:[])).catch(()=>setError('Could not load students')) },[section])
   useEffect(() => { if (section === 'attendance') Promise.all([fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()),fetch(API+'/api/students',{credentials:'include'}).then(r=>r.json())]).then(([c,st])=>{setAttendanceCourses(Array.isArray(c)?c.filter((x:DataRow)=>x.status==='published'):[]);setAttendanceStudents(Array.isArray(st)?st:[]) }).catch(()=>setError('Could not load attendance lists')) }, [section])
   useEffect(() => { if (section === 'zoom') { fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setZoomCourses(Array.isArray(d)?d:[])).catch(()=>setError('Could not load courses for Zoom classes')) } }, [section])
   useEffect(() => { if (section === 'assignments') { fetch(API+'/api/courses',{credentials:'include'}).then(r=>r.json()).then(d=>setAssignmentCourses(Array.isArray(d)?d.filter((x:DataRow)=>x.status==='published'):[])).catch(()=>setError('Could not load published courses')) } }, [section])
@@ -232,7 +246,7 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
           {enrollmentStudents.length===0 && <p className="text-xs text-amber-700 sm:col-span-2">Add a student first in Students. Only published courses can be selected.</p>}
         </form>}
         {section === 'courses' && <div className="flex items-center justify-between border-b p-4"><span className="text-xs text-slate-500">Manage course catalogue</span><button onClick={() => setShowCourseForm(v => !v)} className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white">{showCourseForm ? 'Close' : '+ Add Course'}</button></div>}
-        {section === 'courses' && showCourseForm && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e => { e.preventDefault(); setSavingCourse(true); setError(''); setNotice(''); try { const r=await fetch(API+'/api/courses',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...courseForm,fee_amount:Number(courseForm.fee_amount),currency:'LKR'})}); const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Could not create course'); setNotice('Course created: '+d.course.course_code+' · '+d.course.title); setCourseForm({course_code:'',title:'',description:'',fee_amount:'0',status:'draft',lecturer_id:''}); setShowCourseForm(false); await load('courses') } catch(e) { setError(e instanceof Error ? e.message : 'Could not create course') } finally { setSavingCourse(false) } }}>
+        {section === 'courses' && showCourseForm && <form className="grid gap-3 border-b bg-slate-50 p-4 sm:grid-cols-2" onSubmit={async e => { e.preventDefault(); setSavingCourse(true); setError(''); setNotice(''); try { const r=await fetch(API+'/api/courses',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({...courseForm,fee_amount:Number(courseForm.fee_amount),currency:'LKR'})}); const d=await r.json(); if(!r.ok) throw new Error(d.error || 'Could not create course'); setNotice('Course created: '+d.course.course_code+' · '+d.course.title); setCourseForm({course_code:'',title:'',description:'',fee_amount:'0',status:'draft',lecturer_id:'',course_type:'full_time',qualification:'NVQ Level 4',duration_months:'24',institutional_months:'12',on_job_months:'12',training_locations:'',course_plan:''}); setShowCourseForm(false); await load('courses') } catch(e) { setError(e instanceof Error ? e.message : 'Could not create course') } finally { setSavingCourse(false) } }}>
           <label className="text-xs font-semibold text-slate-600">Course code<input required value={courseForm.course_code} onChange={e=>setCourseForm(v=>({...v,course_code:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
           <label className="text-xs font-semibold text-slate-600">Course title<input required value={courseForm.title} onChange={e=>setCourseForm(v=>({...v,title:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
           <label className="text-xs font-semibold text-slate-600">Course fee (LKR)<input required type="number" min="0" step="0.01" value={courseForm.fee_amount} onChange={e=>setCourseForm(v=>({...v,fee_amount:e.target.value}))} className="mt-1 block w-full rounded-lg border bg-white px-3 py-2.5 text-sm font-normal"/></label>
