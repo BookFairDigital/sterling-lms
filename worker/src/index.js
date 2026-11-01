@@ -204,6 +204,21 @@ export default {async fetch(req,env){
   await env.DB.prepare("INSERT INTO announcements(id,title,body,audience,published_at,created_by) VALUES(?,?,?,?,CURRENT_TIMESTAMP,?)").bind(id,title,body,audience,u.id).run();
   return json({ok:true,id},201,h);
  }
+ if(path==="/api/reports"&&req.method==="GET"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const [students,courses,enrolments,payments,attendance,assignments,monthly,courseStats,recent] = await Promise.all([
+   env.DB.prepare("SELECT COUNT(*) total,SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) active FROM users WHERE role='student'").first(),
+   env.DB.prepare("SELECT COUNT(*) total,SUM(CASE WHEN status='published' THEN 1 ELSE 0 END) published FROM courses").first(),
+   env.DB.prepare("SELECT COUNT(*) total,SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) active FROM enrollments").first(),
+   env.DB.prepare("SELECT COUNT(*) total,COALESCE(SUM(CASE WHEN status='approved' THEN amount ELSE 0 END),0) approved_amount,COALESCE(SUM(CASE WHEN status='pending' THEN amount ELSE 0 END),0) pending_amount,SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) pending_count FROM payments").first(),
+   env.DB.prepare("SELECT COUNT(*) total,SUM(CASE WHEN status='present' THEN 1 ELSE 0 END) present FROM attendance").first(),
+   env.DB.prepare("SELECT COUNT(*) total,(SELECT COUNT(*) FROM submissions) submissions FROM assignments").first(),
+   env.DB.prepare("SELECT strftime('%Y-%m',created_at) month,COUNT(*) count,COALESCE(SUM(CASE WHEN status='approved' THEN amount ELSE 0 END),0) revenue FROM payments WHERE created_at>=date('now','-11 months') GROUP BY strftime('%Y-%m',created_at) ORDER BY month").all(),
+   env.DB.prepare("SELECT c.id,c.course_code,c.title,COUNT(e.id) enrolments FROM courses c LEFT JOIN enrollments e ON e.course_id=c.id GROUP BY c.id ORDER BY enrolments DESC LIMIT 8").all(),
+   env.DB.prepare("SELECT 'Student' type,full_name label,created_at FROM users WHERE role='student' UNION ALL SELECT 'Payment',reference,created_at FROM payments UNION ALL SELECT 'Course',title,created_at FROM courses ORDER BY created_at DESC LIMIT 8").all()
+  ]);
+  return json({students,courses,enrolments,payments,attendance,assignments,monthly:monthly.results||[],course_stats:courseStats.results||[],recent:recent.results||[]},200,h);
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
