@@ -8,7 +8,7 @@ const getBody=async r=>{try{return await r.json()}catch{return null}};
 async function userFor(r,env){const t=r.headers.get("Cookie")?.match(/(?:^|; )sterling_session=([^;]+)/)?.[1];if(!t)return null;return await env.DB.prepare("SELECT u.id,u.email,u.full_name,u.role,u.status FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=? AND s.expires_at>CURRENT_TIMESTAMP AND u.status='active'").bind(await hash(t)).first();}
 export default {async fetch(req,env){
  const origin=req.headers.get("Origin")||"",ownOrigin=new URL(req.url).origin,allowed=[...(env.ALLOWED_ORIGIN||"https://bookfairdigital.github.io").split(",").map(x=>x.trim()),ownOrigin];
- const h={"access-control-allow-origin":allowed.includes(origin)?origin:allowed[0],"access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"Content-Type","vary":"Origin"};
+ const h={"access-control-allow-origin":allowed.includes(origin)?origin:allowed[0],"access-control-allow-credentials":"true","access-control-allow-methods":"GET,POST,PATCH,DELETE,OPTIONS","access-control-allow-headers":"Content-Type","vary":"Origin"};
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:h});
  if(origin&&!allowed.includes(origin))return json({error:"Origin not allowed"},403,h);
  const path=new URL(req.url).pathname.replace(/\/$/,"")||"/";
