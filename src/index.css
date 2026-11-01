@@ -179,3 +179,22 @@ button { cursor: pointer; }
   .sterling-home .sterling-red-hero { background-image: linear-gradient(145deg, #f8fafc, #eef0f2); }
   .sterling-home #about::before { display: none; }
 }
+
+
+/* Unified Sterling red, white and charcoal theme for authenticated portals. */
+.sterling-login { background: linear-gradient(135deg, #202a34 0%, #202a34 62%, #991b1b 100%) !important; }
+.sterling-login button[type="submit"] { background: #dc2626 !important; box-shadow: 0 8px 22px rgb(127 29 29 / 22%) !important; }
+.sterling-login button[type="submit"]:hover { background: #b91c1c !important; }
+.sterling-login [class~="text-blue-600"], .sterling-login [class~="text-blue-700"] { color: #b91c1c !important; }
+.sterling-login [class~="bg-blue-50"] { background: #fff1f2 !important; color: #7f1d1d !important; }
+.sterling-login input:focus { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgb(220 38 38 / 10%); outline: none; }
+.sterling-portal, .sterling-admin { --sterling-red: #dc2626; --sterling-charcoal: #202a34; }
+.sterling-portal [class~="bg-blue-600"], .sterling-admin [class~="bg-blue-600"] { background-color: #dc2626 !important; }
+.sterling-portal [class~="hover:bg-blue-700"]:hover, .sterling-admin [class~="hover:bg-blue-700"]:hover { background-color: #b91c1c !important; }
+.sterling-portal [class~="text-blue-600"], .sterling-portal [class~="text-blue-700"], .sterling-admin [class~="text-blue-600"], .sterling-admin [class~="text-blue-700"] { color: #b91c1c !important; }
+.sterling-portal [class~="bg-blue-50"], .sterling-admin [class~="bg-blue-50"] { background-color: #fff1f2 !important; }
+.sterling-portal [class~="border-blue-200"], .sterling-admin [class~="border-blue-200"] { border-color: #fecaca !important; }
+.sterling-portal input:focus, .sterling-portal select:focus, .sterling-portal textarea:focus, .sterling-admin input:focus, .sterling-admin textarea:focus, .sterling-admin select:focus { border-color: #dc2626 !important; outline-color: #dc2626 !important; }
+.sterling-portal header { border-color: #e5e7eb; }
+.sterling-admin aside, .sterling-portal aside { background-color: #202a34; }
+.sterling-portal .bg-gradient-to-r { background-image: linear-gradient(100deg,#202a34,#3f2529) !important; }
