@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import AdminPanel from './AdminPanel'
 import {
   Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
-  CreditCard, FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
-  MessageSquare, PlayCircle, Search, Settings, Users, Video, Wallet, X,
+  FileText, GraduationCap, LayoutDashboard, LogOut, Menu,
+  MessageSquare, Search, Settings, Users, Video, Wallet, X,
   ChevronRight, Download, BookMarked,
 } from 'lucide-react'
 
@@ -36,7 +36,6 @@ function App() {
   const [page, setPage] = useState<Page>('dashboard')
   const [mobileOpen, setMobileOpen] = useState(false)
   const [search, setSearch] = useState('')
-  const [completed, setCompleted] = useState(false)
   const [studentAnnouncements, setStudentAnnouncements] = useState<any[]>([])
   const [studentPayments, setStudentPayments] = useState<any[]>([])
   const [studentCourses, setStudentCourses] = useState<any[]>([])
