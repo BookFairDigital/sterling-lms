@@ -96,7 +96,7 @@ export default {async fetch(req,env){
  }
 
  if(u.role==="student"&&path==="/api/student/assignments"&&req.method==="GET"){
-  const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.due_at,a.created_at,c.title course_title,c.course_code,s.id submission_id,s.submitted_at,s.grade,s.feedback,CASE WHEN s.id IS NOT NULL THEN 'submitted' WHEN a.due_at IS NOT NULL AND a.due_at<datetime('now') THEN 'overdue' ELSE 'pending' END status FROM assignments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' JOIN courses c ON c.id=a.course_id LEFT JOIN submissions s ON s.assignment_id=a.id AND s.student_id=? ORDER BY CASE WHEN a.due_at IS NULL THEN 1 ELSE 0 END,a.due_at ASC").bind(u.id,u.id).all();
+  const rows=await env.DB.prepare("SELECT a.id,a.title,a.description,a.due_at,a.created_at,c.title course_title,c.course_code,s.id submission_id,s.submitted_at,s.grade,s.feedback,CASE WHEN s.id IS NOT NULL THEN 'submitted' WHEN a.due_at IS NOT NULL AND datetime(a.due_at)<datetime('now') THEN 'overdue' ELSE 'pending' END status FROM assignments a JOIN enrollments e ON e.course_id=a.course_id AND e.student_id=? AND e.status='active' JOIN courses c ON c.id=a.course_id LEFT JOIN submissions s ON s.assignment_id=a.id AND s.student_id=? ORDER BY CASE WHEN a.due_at IS NULL THEN 1 ELSE 0 END,a.due_at ASC").bind(u.id,u.id).all();
   return json(rows.results||[],200,h);
  }
  if(u.role==="student"&&path.startsWith("/api/student/assignments/")&&path.endsWith("/submit")&&req.method==="POST"){
