@@ -280,7 +280,7 @@ function App() {
           <h2 className="mt-2 max-w-[210px] text-2xl font-black leading-[1.05] sm:text-[27px]">The Sterling <span className="text-red-500">Advantage</span></h2>
           <p className="mt-2 max-w-[220px] text-[10px] leading-4 text-slate-300">A trusted training centre with industry experience, recognized qualifications, and strong career pathways.</p>
         </div>
-        {[{icon:GraduationCap,title:'Recognized Qualifications',desc:'NVQ certified programmes'},{icon:Wrench,title:'Practical Training',desc:'Real workshop exposure'},{icon:Users,title:'Experienced Trainers',desc:'Industry professionals'},{icon:TrendingUp,title:'Career Opportunities',desc:'Pathway to employment'}].map((item,i)=><div key={item.title} className="flex min-h-[118px] flex-col items-center justify-center border-t border-slate-200 px-3 py-4 text-center transition hover:bg-red-50/50 lg:border-l lg:border-t-0">
+        {[{icon:GraduationCap,title:'Recognized Qualifications',desc:'NVQ certified programmes'},{icon:Wrench,title:'Practical Training',desc:'Real workshop exposure'},{icon:Users,title:'Experienced Trainers',desc:'Industry professionals'},{icon:TrendingUp,title:'Career Opportunities',desc:'Pathway to employment'}].map((item)=><div key={item.title} className="flex min-h-[118px] flex-col items-center justify-center border-t border-slate-200 px-3 py-4 text-center transition hover:bg-red-50/50 lg:border-l lg:border-t-0">
           <item.icon size={24} strokeWidth={2.1} className="text-red-600"/>
           <h3 className="mt-2 max-w-[145px] text-[11px] font-black leading-tight text-[#202a34]">{item.title}</h3>
           <p className="mt-1 text-[9px] leading-4 text-slate-500">{item.desc}</p>
