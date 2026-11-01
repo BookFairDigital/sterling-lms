@@ -111,7 +111,7 @@ export default function PremiumLanding(props: Props) {
 
     <section id="home" className="relative isolate flex min-h-[590px] items-center overflow-hidden sm:min-h-[650px]">
       {!heroFailed
-        ? <video src={heroVideo} autoPlay muted defaultMuted loop playsInline preload="auto" disablePictureInPicture onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>
+        ? <video src={heroVideo} autoPlay muted loop playsInline preload="auto" disablePictureInPicture onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>
         : <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>}
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black via-black/70 to-black/15"/>
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#080a0c] via-transparent to-black/20"/>
