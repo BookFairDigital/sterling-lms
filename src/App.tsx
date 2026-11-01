@@ -195,7 +195,7 @@ function App() {
     <footer className="bg-[#082544] px-5 py-8 text-center text-xs text-blue-100">© 2026 Sterling Training Centre · TVEC Approved Training Centre</footer>
   </div>
 
-  if (loggedIn && userRole === 'admin') return <AdminPanel onExit={async () => { await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout?role=admin', { method: 'POST', credentials: 'include' }); setLoggedIn(false); setUserRole('') }} />
+  if (loggedIn && (userRole === 'admin' || userRole === 'lecturer')) return <AdminPanel role={userRole} onExit={async () => { await fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout?role=admin', { method: 'POST', credentials: 'include' }); setLoggedIn(false); setUserRole('') }} />
 
   if (!loggedIn && !showLogin) return <PublicWebsite/>;
   if (!loggedIn) return <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#061b33] via-[#0b3a66] to-blue-600 p-4">
