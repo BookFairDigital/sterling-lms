@@ -14,10 +14,14 @@ button, input { font: inherit; }
 button { cursor: pointer; }
 ::selection { background: #dbeafe; color: #1e40af; }
 
-/* Sterling homepage: restrained reveal motion as sections enter the viewport. */
-.sterling-home .sterling-reveal { opacity: 0; transform: translateY(22px); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }
-.sterling-home .sterling-reveal.is-visible { opacity: 1; transform: translateY(0); }
+/* Sterling homepage: smooth, staggered reveal motion as sections and cards enter view. */
+.sterling-home .sterling-reveal { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 700ms ease, transform 700ms cubic-bezier(.2,.7,.2,1); will-change: opacity, transform; }
+.sterling-home .sterling-reveal.is-visible { opacity: 1; transform: translate3d(0, 0, 0); }
 .sterling-home article, .sterling-home a, .sterling-home button { transition-duration: 250ms; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sterling-home article { transition: transform 280ms ease, box-shadow 280ms ease; }
+  .sterling-home article:hover { transform: translateY(-4px); }
+}
 @media (prefers-reduced-motion: reduce) {
   .sterling-home .sterling-reveal, .sterling-home .sterling-reveal.is-visible { opacity: 1; transform: none; transition: none; }
   .sterling-home * { scroll-behavior: auto !important; animation-duration: .01ms !important; }
