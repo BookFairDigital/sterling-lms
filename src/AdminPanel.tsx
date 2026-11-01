@@ -193,6 +193,12 @@ function AdminPanel({ onExit, role = 'admin' }: { onExit: () => void; role?: str
   assessments: ['title','course_title','question_count','duration_minutes','total_marks','pass_mark','status','created_at'],
   lecturers: ['full_name','email','phone','status'],
   attendance: ['student_name','student_number','course_title','class_date','status'],
+    applications: ['full_name','email','phone','course_title','status','created_at'],
+    coursePlans: ['title','course_title','plan_order','start_month','end_month'],
+    continuous: ['student_name','student_number','course_title','title','assessment_type','score','max_score','assessed_at'],
+    gallery: ['title','category','file_type','created_at'],
+    chat: ['sender_name','sender_email','message','status','created_at'],
+    siteSettings: ['key','value'],
   }
   const labels: Record<string, string> = { due_at:'Due date',submission_count:'Submissions', student_number: 'Student ID', student_name: 'Student', course_title: 'Course', course_code: 'Course Code', file_type: 'File type', file_size: 'Size (bytes)', full_name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', title: 'Title', fee_amount: 'Fee', currency: 'Currency', id: 'Payment ID', amount: 'Amount', starts_at: 'Starts', duration_minutes: 'Duration (min)', meeting_url: 'Meeting link', body: 'Message', audience: 'Audience', published_at: 'Published', created_at: 'Created',course_type:'Course type',qualification:'Qualification',duration_months:'Duration (months)',start_month:'Start month',end_month:'End month',max_score:'Maximum score',score:'Score',assessment_type:'Assessment type',category:'Category',message:'Message' }
   return <div className="min-h-screen bg-[#f3f6fb] text-slate-900">
