@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import BrandLogo from './BrandLogo'
 import {
-  ArrowRight, Award, BookOpen, BriefcaseBusiness, CarFront, CheckCircle2,
+  ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
   GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings,
   ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck,
 } from 'lucide-react'
