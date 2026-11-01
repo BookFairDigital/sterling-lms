@@ -13,3 +13,12 @@ body { margin: 0; min-width: 320px; min-height: 100vh; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 ::selection { background: #dbeafe; color: #1e40af; }
+
+/* Sterling homepage: restrained reveal motion as sections enter the viewport. */
+.sterling-home .sterling-reveal { opacity: 0; transform: translateY(22px); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }
+.sterling-home .sterling-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.sterling-home article, .sterling-home a, .sterling-home button { transition-duration: 250ms; }
+@media (prefers-reduced-motion: reduce) {
+  .sterling-home .sterling-reveal, .sterling-home .sterling-reveal.is-visible { opacity: 1; transform: none; transition: none; }
+  .sterling-home * { scroll-behavior: auto !important; animation-duration: .01ms !important; }
+}
