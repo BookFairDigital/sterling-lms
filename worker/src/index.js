@@ -87,6 +87,8 @@ export default {async fetch(req,env){
   if(u.role!=="admin")return json({error:"Admin access required"},403,h);
   const b=await getBody(req),code=String(b?.course_code||"").trim().toUpperCase(),title=String(b?.title||"").trim(),description=String(b?.description||"").trim(),fee=Number(b?.fee_amount||0),currency=String(b?.currency||"LKR").trim().toUpperCase(),status=String(b?.status||"draft"),lecturerId=String(b?.lecturer_id||"")||null;
   if(!code||!title||!Number.isFinite(fee)||fee<0||!["draft","published"].includes(status))return json({error:"Course code, title, valid fee and status are required"},400,h);
+  if(status==="published"&&!lecturerId)return json({error:"Assign a lecturer before publishing this course"},400,h);
+  if(lecturerId){const lecturer=await env.DB.prepare("SELECT id FROM users WHERE id=? AND role='lecturer' AND status='active'").bind(lecturerId).first();if(!lecturer)return json({error:"Choose an active lecturer account"},400,h);}
   try{const id=crypto.randomUUID();await env.DB.prepare("INSERT INTO courses(id,title,course_code,description,fee_amount,currency,status,lecturer_id) VALUES(?,?,?,?,?,?,?,?)").bind(id,title,code,description||null,fee,currency,status,lecturerId).run();return json({ok:true,course:{id,course_code:code,title,fee_amount:fee,currency,status,lecturer_id:lecturerId}},201,h);}catch(e){if(String(e?.message||e).toLowerCase().includes("unique"))return json({error:"That course code is already in use"},409,h);throw e;}
  }
  if(path==="/api/enrollments"&&req.method==="GET"){
