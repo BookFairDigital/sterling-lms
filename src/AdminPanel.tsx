@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import BrandLogo from './BrandLogo'
-import { Activity, BookOpen, CircleDollarSign, GraduationCap, LayoutDashboard, LogOut, RefreshCw, Users, Video, Bell, UserPlus, ClipboardList, FileBarChart } from 'lucide-react'
+import { Activity, BookOpen, CircleDollarSign, LayoutDashboard, LogOut, RefreshCw, Users, Video, Bell, UserPlus, ClipboardList, FileBarChart } from 'lucide-react'
 
 type Section = 'overview' | 'students' | 'courses' | 'enrollments' | 'materials' | 'payments' | 'zoom' | 'announcements' | 'assignments' | 'assessments' | 'reports'
 type DataRow = Record<string, string | number | null>
