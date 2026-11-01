@@ -176,6 +176,8 @@ function AdminPanel({ onExit }: { onExit: () => void }) {
     announcements: ['title', 'body', 'audience', 'published_at', 'created_at'],
     assignments: ['title','course_title','due_at','submission_count','created_at'],
   assessments: ['title','course_title','question_count','duration_minutes','total_marks','pass_mark','status','created_at'],
+  lecturers: ['full_name','email','phone','status'],
+  attendance: ['student_name','student_number','course_title','class_date','status'],
   }
   const labels: Record<string, string> = { due_at:'Due date',submission_count:'Submissions', student_number: 'Student ID', student_name: 'Student', course_title: 'Course', course_code: 'Course Code', file_type: 'File type', file_size: 'Size (bytes)', full_name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', title: 'Title', fee_amount: 'Fee', currency: 'Currency', id: 'Payment ID', amount: 'Amount', starts_at: 'Starts', duration_minutes: 'Duration (min)', meeting_url: 'Meeting link', body: 'Message', audience: 'Audience', published_at: 'Published', created_at: 'Created' }
   return <div className="min-h-screen bg-[#f3f6fb] text-slate-900">
