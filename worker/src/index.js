@@ -276,6 +276,18 @@ export default {async fetch(req,env){
   if(type==="assignments"){const subs=await env.DB.prepare("SELECT file_key FROM submissions WHERE assignment_id=?").bind(id).all();await env.DB.prepare("DELETE FROM submissions WHERE assignment_id=?").bind(id).run();for(const s of subs.results||[])if(s.file_key)await env.FILES.delete(s.file_key);const r=await env.DB.prepare("DELETE FROM assignments WHERE id=?").bind(id).run();if(!r.meta?.changes)return json({error:"Assignment not found"},404,h);return json({ok:true},200,h);}
   const table={enrollments:"enrollments","zoom-classes":"zoom_classes",announcements:"announcements"}[type];const r=await env.DB.prepare("DELETE FROM "+table+" WHERE id=?").bind(id).run();if(!r.meta?.changes)return json({error:"Record not found"},404,h);return json({ok:true},200,h);
  }
+
+ if(path.startsWith("/api/materials/")&&path.endsWith("/replace")&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const id=path.split("/")[3],form=await req.formData(),file=form.get("file");
+  if(!(file instanceof File)||file.size>20*1024*1024)return json({error:"Choose a file up to 20 MB"},400,h);
+  const allowed=["application/pdf","image/jpeg","image/png","video/mp4","application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  if(!allowed.includes(file.type))return json({error:"Unsupported file type"},400,h);
+  const old=await env.DB.prepare("SELECT file_key FROM learning_materials WHERE id=?").bind(id).first();if(!old)return json({error:"Material not found"},404,h);
+  const key="materials/"+id+"/"+file.name.replace(/[^a-zA-Z0-9._-]/g,"_");await env.FILES.put(key,file.stream(),{httpMetadata:{contentType:file.type}});
+  await env.DB.prepare("UPDATE learning_materials SET file_key=?,file_type=?,file_size=? WHERE id=?").bind(key,file.type,file.size,id).run();
+  if(old.file_key)await env.FILES.delete(old.file_key);return json({ok:true},200,h);
+ }
  if(path.startsWith("/api/payments/")&&path.endsWith("/receipt")&&req.method==="GET"){
   if(u.role!=="admin")return json({error:"Admin access required"},403,h);
   const id=path.split("/")[3],row=await env.DB.prepare("SELECT receipt_key FROM payments WHERE id=?").bind(id).first();if(!row?.receipt_key)return json({error:"Receipt not found"},404,h);
