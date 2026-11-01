@@ -10,7 +10,7 @@ const sections: { id: Section; label: string; icon: typeof LayoutDashboard }[] =
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'enrollments', label: 'Enrollments', icon: UserPlus },
   { id: 'assignments', label: 'Assignments', icon: ClipboardList },
-  { id: 'assessments', label: 'Assessments', icon: FileBarChart },
+  { id: 'assessments', label: 'Online Assessments', icon: FileBarChart },
   { id: 'materials', label: 'Learning Materials', icon: BookOpen },
   { id: 'payments', label: 'Payments', icon: CircleDollarSign },
   { id: 'zoom', label: 'Zoom Classes', icon: Video },
