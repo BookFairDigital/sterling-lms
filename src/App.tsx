@@ -35,7 +35,7 @@ const assignments = [
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [userRole, setUserRole] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
   const [studentId, setStudentId] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(true)
@@ -73,6 +73,7 @@ function App() {
         setLoggedIn(true)
       })
       .catch(() => {})
+      .finally(() => { if (active) setAuthLoading(false) })
     return () => { active = false }
   }, [])
 
