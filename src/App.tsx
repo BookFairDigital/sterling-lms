@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import AdminPanel from './AdminPanel'
 import BrandLogo from './BrandLogo'
 import {
-  Activity, Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
+  Bell, BookOpen, CalendarDays, CheckCircle2, ClipboardList,
   FileText, LayoutDashboard, LogOut, Menu,
   Search, Settings, Users, Video, Wallet, X,
   ChevronRight, Download, BookMarked,
