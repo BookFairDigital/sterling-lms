@@ -78,15 +78,7 @@ function App() {
   const [chatForm,setChatForm]=useState({name:'',email:'',message:''})
   const [chatNotice,setChatNotice]=useState('')
 
-  useEffect(() => {
-    let active = true
-    const api='https://sterling-lms-api.texascampus1.workers.dev'
-    Promise.all([fetch(api+'/auth/me?role=student',{credentials:'include'}),fetch(api+'/auth/me?role=admin',{credentials:'include'})])
-      .then(async responses=>{for(const response of responses){if(response.ok){const data=await response.json();if(active&&data?.user){setUserRole(data.user.role);setLoggedIn(true);return}}}})
-      .catch(()=>{})
-      .finally(()=>{if(active)setAuthLoading(false)})
-    return () => { active = false }
-  }, [])
+  useEffect(() => { setAuthLoading(false) }, [])
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault()
