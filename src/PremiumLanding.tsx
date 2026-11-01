@@ -3,8 +3,7 @@ import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CarFront, CheckCircle2,
   GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings,
-  ShieldCheck, Users, Wrench, X, Mail, Instagram, Facebook,
-  Youtube, Linkedin, Clock3, BadgeCheck,
+  ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck,
 } from 'lucide-react'
 
 type Course = {
@@ -197,9 +196,9 @@ export default function PremiumLanding(props: Props) {
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
     <style>{`
       html { scroll-behavior: smooth; }
-      .sterling-premium section { scroll-margin-top: 88px; }
+      .sterling-premium section { scroll-margin-top: 88px; }\n      .sterling-premium .sterling-reveal { opacity: 0; transform: translate3d(0,24px,0); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }\n      .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: translate3d(0,0,0); }
       .sterling-premium img, .sterling-premium video { backface-visibility: hidden; }
-      @media (prefers-reduced-motion: reduce) {
+      @media (prefers-reduced-motion: reduce) {\n        .sterling-premium .sterling-reveal, .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: none; }
         .sterling-premium *, .sterling-premium *::before, .sterling-premium *::after { scroll-behavior: auto !important; animation: none !important; transition-duration: .01ms !important; }
         .sterling-premium video { display: none !important; }
       }
