@@ -60,6 +60,22 @@ function App() {
   const [liveError, setLiveError] = useState('')
   const [liveNotice, setLiveNotice] = useState('')
 
+  useEffect(() => {
+    let active = true
+    fetch('https://sterling-lms-api.texascampus1.workers.dev/auth/me', { credentials: 'include' })
+      .then(async response => {
+        if (!response.ok) return null
+        return response.json()
+      })
+      .then(data => {
+        if (!active || !data?.user) return
+        setUserRole(data.user.role)
+        setLoggedIn(true)
+      })
+      .catch(() => {})
+    return () => { active = false }
+  }, [])
+
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!studentId.trim() || !password.trim()) { setError('Please enter your email and password.'); return }
