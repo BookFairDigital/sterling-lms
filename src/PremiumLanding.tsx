@@ -63,10 +63,12 @@ const courseImage = (course: Course, settings: Record<string, string>) => {
 export default function PremiumLanding(props: Props) {
   const [mobileMenu, setMobileMenu] = useState(false)
   const [mobileTab, setMobileTab] = useState('Home')
+  const [heroFailed, setHeroFailed] = useState(false)
   const [headlightFailed, setHeadlightFailed] = useState(false)
   const [driveFailed, setDriveFailed] = useState(false)
   const [galleryStart, setGalleryStart] = useState(0)
   const heroImage = props.settings.hero_image_url || photos.hero
+  const heroVideo = `${import.meta.env.BASE_URL}videos/hero-background.mp4`
   const headlightVideo = `${import.meta.env.BASE_URL}videos/headlight-repair.mp4`
   const driveVideo = `${import.meta.env.BASE_URL}videos/automotive-career-drive.mp4`
   const nav = [
@@ -108,7 +110,9 @@ export default function PremiumLanding(props: Props) {
     </header>
 
     <section id="home" className="relative isolate flex min-h-[590px] items-center overflow-hidden sm:min-h-[650px]">
-      <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="absolute inset-0 -z-20 h-full w-full object-cover object-center"/>
+      {!heroFailed
+        ? <video src={heroVideo} autoPlay muted loop playsInline preload="auto" onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="absolute inset-0 -z-20 h-full w-full object-cover object-center"/>
+        : <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="absolute inset-0 -z-20 h-full w-full object-cover object-center"/>}
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black via-black/85 to-black/15"/>
       <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#080a0c] via-transparent to-black/20"/>
       
