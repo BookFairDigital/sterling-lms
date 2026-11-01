@@ -219,6 +219,69 @@ export default {async fetch(req,env){
   ]);
   return json({students,courses,enrolments,payments,attendance,assignments,monthly:monthly.results||[],course_stats:courseStats.results||[],recent:recent.results||[]},200,h);
  }
+
+ if(path.startsWith("/api/students/")&&path.endsWith("/reset-password")&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const id=path.split("/")[3],b=await getBody(req),password=String(b?.password||"");
+  if(password.length<12)return json({error:"Password must be at least 12 characters"},400,h);
+  const student=await env.DB.prepare("SELECT id FROM users WHERE id=? AND role='student'").bind(id).first();if(!student)return json({error:"Student not found"},404,h);
+  const salt=hex(random(16).buffer),digest=await pwHash(password,salt);
+  await env.DB.prepare("UPDATE users SET password_hash=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(salt+":"+digest,id).run();
+  await env.DB.prepare("DELETE FROM sessions WHERE user_id=?").bind(id).run();return json({ok:true},200,h);
+ }
+ if(path==="/api/enrollments/bulk"&&req.method==="POST"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const b=await getBody(req),courseId=String(b?.course_id||""),ids=Array.isArray(b?.student_ids)?[...new Set(b.student_ids.map(String))]:[];
+  if(!courseId||!ids.length||ids.length>200)return json({error:"Select a course and 1–200 students"},400,h);
+  const course=await env.DB.prepare("SELECT id FROM courses WHERE id=? AND status='published'").bind(courseId).first();if(!course)return json({error:"Choose a published course"},400,h);
+  const statements=[];for(const id of ids){const s=await env.DB.prepare("SELECT id FROM users WHERE id=? AND role='student' AND status='active'").bind(id).first();if(s)statements.push(env.DB.prepare("INSERT OR IGNORE INTO enrollments(id,student_id,course_id,status) VALUES(?,?,?,'active')").bind(crypto.randomUUID(),id,courseId));}
+  if(statements.length)await env.DB.batch(statements);return json({ok:true,processed:statements.length,selected:ids.length},200,h);
+ }
+ const adminRecord=path.match(/^\/api\/(students|courses|enrollments|materials|zoom-classes|announcements|assignments)\/([^/]+)$/);
+ if(adminRecord&&(req.method==="PATCH"||req.method==="DELETE")){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const type=adminRecord[1],id=adminRecord[2];
+  if(req.method==="PATCH"){
+   const b=await getBody(req);let result;
+   if(type==="students"){
+    const name=String(b.full_name||"").trim(),email=String(b.email||"").trim().toLowerCase(),phone=String(b.phone||"").trim(),status=String(b.status||"active");
+    if(!name||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||!["active","inactive","suspended"].includes(status))return json({error:"Enter valid student details"},400,h);
+    result=await env.DB.prepare("UPDATE users SET full_name=?,email=?,phone=?,status=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND role='student'").bind(name,email,phone||null,status,id).run();
+   }else if(type==="courses"){
+    const title=String(b.title||"").trim(),code=String(b.course_code||"").trim().toUpperCase(),fee=Number(b.fee_amount),status=String(b.status||"draft");
+    if(!title||!code||!Number.isFinite(fee)||fee<0||!["draft","published","archived"].includes(status))return json({error:"Enter valid course details"},400,h);
+    result=await env.DB.prepare("UPDATE courses SET title=?,course_code=?,description=?,fee_amount=?,status=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(title,code,String(b.description||""),fee,status,id).run();
+   }else if(type==="enrollments"){
+    const status=String(b.status||"");if(!["pending","active","completed","cancelled"].includes(status))return json({error:"Invalid enrolment status"},400,h);
+    result=await env.DB.prepare("UPDATE enrollments SET status=? WHERE id=?").bind(status,id).run();
+   }else if(type==="materials"){
+    const title=String(b.title||"").trim();if(!title)return json({error:"Title is required"},400,h);
+    result=await env.DB.prepare("UPDATE learning_materials SET title=? WHERE id=?").bind(title,id).run();
+   }else if(type==="zoom-classes"){
+    const title=String(b.title||"").trim(),url=String(b.meeting_url||""),starts=String(b.starts_at||""),duration=Number(b.duration_minutes);let parsed;try{parsed=new URL(url)}catch{return json({error:"Invalid meeting URL"},400,h)}
+    if(!title||parsed.protocol!=="https:"||!starts||!Number.isInteger(duration)||duration<1||duration>720)return json({error:"Enter valid class details"},400,h);
+    result=await env.DB.prepare("UPDATE zoom_classes SET title=?,meeting_url=?,starts_at=?,duration_minutes=? WHERE id=?").bind(title,url,starts,duration,id).run();
+   }else if(type==="announcements"){
+    const title=String(b.title||"").trim(),body=String(b.body||"").trim(),audience=String(b.audience||"all");if(!title||!body||!["all","students","lecturers"].includes(audience))return json({error:"Enter valid announcement details"},400,h);
+    result=await env.DB.prepare("UPDATE announcements SET title=?,body=?,audience=? WHERE id=?").bind(title,body,audience,id).run();
+   }else if(type==="assignments"){
+    const title=String(b.title||"").trim(),course=String(b.course_id||"");if(!title||!course)return json({error:"Course and title are required"},400,h);
+    result=await env.DB.prepare("UPDATE assignments SET title=?,description=?,due_at=?,course_id=? WHERE id=?").bind(title,String(b.description||""),String(b.due_at||"")||null,course,id).run();
+   }
+   if(!result?.meta?.changes)return json({error:"Record not found or unchanged"},404,h);return json({ok:true},200,h);
+  }
+  if(type==="students"){const r=await env.DB.prepare("UPDATE users SET status='inactive',updated_at=CURRENT_TIMESTAMP WHERE id=? AND role='student'").bind(id).run();if(!r.meta?.changes)return json({error:"Student not found"},404,h);await env.DB.prepare("DELETE FROM sessions WHERE user_id=?").bind(id).run();return json({ok:true,archived:true},200,h);}
+  if(type==="courses"){const deps=await env.DB.prepare("SELECT (SELECT COUNT(*) FROM enrollments WHERE course_id=?)+(SELECT COUNT(*) FROM learning_materials WHERE course_id=?)+(SELECT COUNT(*) FROM assignments WHERE course_id=?)+(SELECT COUNT(*) FROM zoom_classes WHERE course_id=?) n").bind(id,id,id,id).first();if(deps.n)return json({error:"Course has linked records. Archive it instead of deleting."},409,h);const r=await env.DB.prepare("DELETE FROM courses WHERE id=?").bind(id).run();if(!r.meta?.changes)return json({error:"Course not found"},404,h);return json({ok:true},200,h);}
+  if(type==="materials"){const row=await env.DB.prepare("SELECT file_key FROM learning_materials WHERE id=?").bind(id).first();if(!row)return json({error:"Material not found"},404,h);await env.DB.prepare("DELETE FROM learning_materials WHERE id=?").bind(id).run();if(row.file_key)await env.FILES.delete(row.file_key);return json({ok:true},200,h);}
+  if(type==="assignments"){const subs=await env.DB.prepare("SELECT file_key FROM submissions WHERE assignment_id=?").bind(id).all();await env.DB.prepare("DELETE FROM submissions WHERE assignment_id=?").bind(id).run();for(const s of subs.results||[])if(s.file_key)await env.FILES.delete(s.file_key);const r=await env.DB.prepare("DELETE FROM assignments WHERE id=?").bind(id).run();if(!r.meta?.changes)return json({error:"Assignment not found"},404,h);return json({ok:true},200,h);}
+  const table={enrollments:"enrollments","zoom-classes":"zoom_classes",announcements:"announcements"}[type];const r=await env.DB.prepare("DELETE FROM "+table+" WHERE id=?").bind(id).run();if(!r.meta?.changes)return json({error:"Record not found"},404,h);return json({ok:true},200,h);
+ }
+ if(path.startsWith("/api/payments/")&&path.endsWith("/receipt")&&req.method==="GET"){
+  if(u.role!=="admin")return json({error:"Admin access required"},403,h);
+  const id=path.split("/")[3],row=await env.DB.prepare("SELECT receipt_key FROM payments WHERE id=?").bind(id).first();if(!row?.receipt_key)return json({error:"Receipt not found"},404,h);
+  const obj=await env.FILES.get(row.receipt_key);if(!obj)return json({error:"Receipt file missing"},404,h);
+  return new Response(obj.body,{status:200,headers:{...h,"content-type":obj.httpMetadata?.contentType||"application/octet-stream","content-disposition":"inline","cache-control":"private, no-store"}});
+ }
  if(path==="/api/dashboard"){const q=await Promise.all(["SELECT COUNT(*) n FROM users WHERE role='student'","SELECT COUNT(*) n FROM courses WHERE status='published'","SELECT COUNT(*) n FROM payments WHERE status='pending'","SELECT COUNT(*) n FROM zoom_classes WHERE starts_at>=CURRENT_TIMESTAMP"].map(s=>env.DB.prepare(s).first()));return json({students:q[0].n,courses:q[1].n,pending_payments:q[2].n,upcoming_classes:q[3].n},200,h);}
  const sql={"/api/students":"SELECT id,student_number,full_name,email,phone,status,created_at FROM users WHERE role='student' ORDER BY created_at DESC","/api/courses":"SELECT * FROM courses ORDER BY created_at DESC","/api/zoom-classes":"SELECT z.*,c.title course_title FROM zoom_classes z LEFT JOIN courses c ON c.id=z.course_id ORDER BY z.starts_at DESC","/api/payments":"SELECT p.*,u.full_name student_name,c.title course_title FROM payments p LEFT JOIN users u ON u.id=p.student_id LEFT JOIN courses c ON c.id=p.course_id ORDER BY p.created_at DESC","/api/announcements":"SELECT * FROM announcements ORDER BY created_at DESC"};
  if(req.method==="GET"&&sql[path]){const result=await env.DB.prepare(sql[path]).all();return json(result.results,200,h);}
