@@ -233,7 +233,7 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
   }
 
   const pretty = (value: unknown) => value === null || value === undefined || value === '' ? '—' : String(value)
-  const columns: Record<Exclude<Section, 'overview' | 'reports'>, string[]> = {
+  const columns: Record<Exclude<Section, 'overview' | 'reports' | 'admins'>, string[]> = {
     enrollments: ['student_number', 'student_name', 'course_code', 'course_title', 'status', 'created_at'],
     materials: ['title','course_title','file_type','file_size','created_at'],
     students: ['student_number', 'full_name', 'email', 'phone', 'status'],
