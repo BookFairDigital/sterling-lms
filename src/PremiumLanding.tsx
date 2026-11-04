@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type Dispatch, type SetStateAction } from 'react'
+import { useEffect, useState, type FormEvent, type Dispatch, type SetStateAction } from 'react'
 import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
@@ -63,6 +63,13 @@ const courseImage = (course: Course, settings: Record<string, string>) => {
 export default function PremiumLanding(props: Props) {
   const [mobileMenu, setMobileMenu] = useState(false)
   const [mobileTab, setMobileTab] = useState('Home')
+  const [mobileNavScrolled, setMobileNavScrolled] = useState(false)
+  useEffect(() => {
+    const updateScroll = () => setMobileNavScrolled(window.scrollY > 48)
+    updateScroll()
+    window.addEventListener('scroll', updateScroll, { passive: true })
+    return () => window.removeEventListener('scroll', updateScroll)
+  }, [])
   const [heroFailed, setHeroFailed] = useState(false)
   const [headlightFailed, setHeadlightFailed] = useState(false)
   const [driveFailed, setDriveFailed] = useState(false)
@@ -203,23 +210,65 @@ export default function PremiumLanding(props: Props) {
 
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
 
-    <nav aria-label="Mobile quick navigation" className="fixed inset-x-0 bottom-0 z-[70] grid grid-cols-5 border-t-2 border-[#e31b23]/70 bg-[#080a0c]/[.97] px-1 pt-2 shadow-[0_-8px_30px_rgba(227,27,35,.12)] backdrop-blur-xl sm:hidden" style={{paddingBottom:'max(9px, env(safe-area-inset-bottom))'}}>
+    <nav aria-label="Mobile quick navigation" className={'sterling-mobile-nav fixed inset-x-0 bottom-0 z-[70] grid grid-cols-5 px-1 pt-2 sm:hidden '+(mobileNavScrolled?'is-scrolled':'')} style={{paddingBottom:'max(9px, env(safe-area-inset-bottom))'}}>
       {[
         {label:'Home',href:'#home',icon:House},
         {label:'Courses',href:'#courses',icon:GraduationCap},
         {label:'Locations',href:'#locations',icon:MapPin},
         {label:'Apply',href:'#apply',icon:FilePenLine},
-      ].map(({label,href,icon:Icon})=><a key={label} href={href} onClick={()=>setMobileTab(label)} aria-current={mobileTab===label?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab===label?'text-[#e31b23]':'text-[#aeb4bf] hover:text-white')}>
-        <Icon size={28} strokeWidth={mobileTab===label?2.6:2.1} fill={label==='Home'?'currentColor':'none'}/>
-        <span className="text-[11px] font-semibold leading-tight">{label}</span>
+      ].map(({label,href,icon:Icon})=><a key={label} href={href} onClick={()=>setMobileTab(label)} aria-current={mobileTab===label?'page':undefined} className={'sterling-nav-item flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab===label?'is-selected text-[#ff333b]':'text-[#c3c8d1] hover:text-white')}>
+        <span className="sterling-nav-icon"><Icon size={28} strokeWidth={mobileTab===label?2.6:2.1} fill={label==='Home'?'currentColor':'none'}/></span>
+        <span className="sterling-nav-label text-[11px] font-semibold leading-tight">{label}</span>
       </a>)}
-      <button type="button" onClick={()=>{setMobileTab('Login');props.onLogin()}} aria-current={mobileTab==='Login'?'page':undefined} className={'flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab==='Login'?'text-[#e31b23]':'text-[#aeb4bf] hover:text-white')}>
-        <span className="relative inline-flex"><UserRound size={27} strokeWidth={mobileTab==='Login'?2.6:2.1}/><LockKeyhole size={12} strokeWidth={2.4} className="absolute -bottom-0.5 -right-2 rounded-sm bg-[#080a0c]"/></span>
-        <span className="text-[11px] font-semibold leading-tight">Login</span>
+      <button type="button" onClick={()=>{setMobileTab('Login');props.onLogin()}} aria-current={mobileTab==='Login'?'page':undefined} className={'sterling-nav-item flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors '+(mobileTab==='Login'?'is-selected text-[#ff333b]':'text-[#c3c8d1] hover:text-white')}>
+        <span className="sterling-nav-icon relative inline-flex"><UserRound size={27} strokeWidth={mobileTab==='Login'?2.6:2.1}/><LockKeyhole size={12} strokeWidth={2.4} className="absolute -bottom-0.5 -right-2 rounded-sm bg-[#17191f]"/></span>
+        <span className="sterling-nav-label text-[11px] font-semibold leading-tight">Login</span>
       </button>
     </nav>
     <style>{`
       html { scroll-behavior: smooth; }
+      .sterling-mobile-nav {
+        isolation: isolate;
+        overflow: hidden;
+        border-top: 1px solid rgba(255,255,255,.24);
+        background: linear-gradient(135deg, rgba(24,27,33,.82), rgba(7,9,12,.76) 58%, rgba(70,16,22,.78));
+        box-shadow: 0 -12px 38px rgba(0,0,0,.34), 0 -2px 24px rgba(227,27,35,.13), inset 0 1px 0 rgba(255,255,255,.12);
+        -webkit-backdrop-filter: blur(26px) saturate(185%);
+        backdrop-filter: blur(26px) saturate(185%);
+        transition: background .35s ease, box-shadow .35s ease, border-color .35s ease;
+      }
+      .sterling-mobile-nav::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at 50% -35%, rgba(255,255,255,.19), transparent 58%), linear-gradient(90deg, transparent, rgba(227,27,35,.08), transparent);
+      }
+      .sterling-mobile-nav.is-scrolled {
+        border-top-color: rgba(255,255,255,.32);
+        background: linear-gradient(135deg, rgba(29,32,39,.72), rgba(8,10,14,.68) 58%, rgba(82,17,24,.72));
+        box-shadow: 0 -16px 44px rgba(0,0,0,.4), 0 -3px 28px rgba(227,27,35,.2), inset 0 1px 0 rgba(255,255,255,.18);
+      }
+      .sterling-nav-item { position: relative; -webkit-tap-highlight-color: transparent; }
+      .sterling-nav-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transform: scale(1);
+        transform-origin: center;
+        transition: transform 280ms cubic-bezier(.2,.8,.2,1), filter 280ms ease;
+        filter: drop-shadow(0 2px 5px rgba(0,0,0,.22));
+      }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-icon { transform: scale(1.13); }
+      .sterling-mobile-nav .sterling-nav-item.is-selected .sterling-nav-icon { transform: scale(.9); filter: drop-shadow(0 0 8px rgba(255,45,55,.4)); }
+      .sterling-nav-item:active .sterling-nav-icon { transform: scale(.82) !important; }
+      .sterling-nav-label { transition: transform 280ms ease, opacity 280ms ease; }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-label { transform: translateY(1px); }
+      @media (prefers-reduced-motion: reduce) {
+        .sterling-mobile-nav, .sterling-nav-icon, .sterling-nav-label { transition: none !important; }
+      }
+
       .sterling-premium section { scroll-margin-top: 88px; }
       .sterling-premium .sterling-reveal { opacity: 0; transform: translate3d(0,24px,0); transition: opacity 650ms ease, transform 650ms cubic-bezier(.2,.7,.2,1); }
       .sterling-premium .sterling-reveal.is-visible { opacity: 1; transform: translate3d(0,0,0); }
