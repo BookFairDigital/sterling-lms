@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+
+const apiFetch = (input: RequestInfo | URL, init: RequestInit = {}, token = '') => { const headers = new Headers(init.headers); if (token) headers.set('Authorization', `Bearer ${token}`); return fetch(input, { ...init, headers }) }
 import AdminPanel from './AdminPanel'
 import PremiumLanding from './PremiumLanding'
 import BrandLogo from './BrandLogo'
