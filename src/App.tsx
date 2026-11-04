@@ -33,6 +33,7 @@ type Page = typeof nav[number]['id'] | 'assessments'
 function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [authToken, setAuthToken] = useState('')
+  const [adminPermissions, setAdminPermissions] = useState<string[] | null>(null)
   const [userRole, setUserRole] = useState('')
   const [authLoading, setAuthLoading] = useState(true)
   const [studentId, setStudentId] = useState('')
@@ -95,7 +96,7 @@ function App() {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Sign in failed')
-      setAuthToken(data.token || ''); setUserRole(data.user.role); setLoggedIn(true); setPassword('')
+      setAuthToken(data.token || ''); setAdminPermissions(Array.isArray(data.user.permissions)?data.user.permissions:null); setUserRole(data.user.role); setLoggedIn(true); setPassword('')
     } catch (err) { setError(err instanceof Error ? err.message : 'Unable to sign in. Please try again.') }
     finally { setAuthLoading(false) }
   }
@@ -198,7 +199,7 @@ function App() {
     onChatSubmit={submitChat}
   />
 
-  if (loggedIn && (userRole === 'admin' || userRole === 'lecturer')) return <AdminPanel role={userRole} authToken={authToken} onExit={async () => { await apiFetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout?role=admin', { method: 'POST', credentials: 'include' }, authToken); setAuthToken(''); setLoggedIn(false); setUserRole('') }} />
+  if (loggedIn && (userRole === 'admin' || userRole === 'lecturer')) return <AdminPanel role={userRole} authToken={authToken} adminPermissions={adminPermissions} onExit={async () => { await apiFetch('https://sterling-lms-api.texascampus1.workers.dev/auth/logout?role=admin', { method: 'POST', credentials: 'include' }, authToken); setAuthToken(''); setAdminPermissions(null); setLoggedIn(false); setUserRole('') }} />
 
   if (!loggedIn && !showLogin) return <PublicWebsite/>;
   if (!loggedIn) return <div className="sterling-login flex min-h-screen items-center justify-center bg-gradient-to-br from-[#202a34] via-[#202a34] to-red-700 p-4">
