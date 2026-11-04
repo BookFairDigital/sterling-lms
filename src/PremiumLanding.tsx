@@ -116,22 +116,22 @@ export default function PremiumLanding(props: Props) {
       {mobileMenu&&<nav className="grid gap-1 border-t border-white/10 bg-[#111519] p-4 xl:hidden">{nav.map(([label,href])=><a key={label} href={href} onClick={()=>setMobileMenu(false)} className="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-white/5 hover:text-red-400">{label}</a>)}<button onClick={()=>{setMobileMenu(false);props.onLogin()}} className="mt-2 rounded-lg border border-white/20 px-3 py-3 text-left text-sm font-bold">Student Login</button><a href="#apply" onClick={()=>setMobileMenu(false)} className="rounded-lg bg-red-600 px-3 py-3 text-sm font-bold">Apply Now</a></nav>}
     </header>
 
-    <section id="home" className="relative isolate flex min-h-[590px] items-center overflow-hidden sm:min-h-[650px]">
+    <section id="home" className="relative isolate flex min-h-[620px] items-center overflow-hidden sm:min-h-[650px]">
       {!heroFailed
         ? <video src={heroVideo} autoPlay muted loop playsInline preload="auto" disablePictureInPicture onError={()=>setHeroFailed(true)} aria-label="Sterling automotive workshop hero background" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>
         : <img src={heroImage} alt="Automotive technician working in a vehicle workshop" fetchPriority="high" className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"/>}
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-r from-black via-black/70 to-black/15"/>
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-[#080a0c] via-transparent to-black/20"/>
       
-      <div className="relative z-20 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-6 py-20 sm:px-10 lg:grid-cols-[.95fr_1.05fr]">
+      <div className="relative z-20 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-5 py-16 sm:px-10 sm:py-20 lg:grid-cols-[.95fr_1.05fr]">
         <div className="max-w-[690px]">
           <p className="mb-5 text-[10px] font-black uppercase tracking-[.35em] text-red-400 sm:text-xs">Sterling Training Centre</p>
-          <h1 className="max-w-[700px] text-4xl font-black italic leading-[.98] tracking-tight sm:text-6xl lg:text-[72px]">BUILD YOUR FUTURE IN THE <span className="text-red-500">AUTOMOTIVE INDUSTRY</span></h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-neutral-200 sm:text-lg">Develop practical technical skills, learn from industry professionals and build a successful career with Sterling.</p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <a href="#apply" className="rounded-lg bg-[#e31b23] px-6 py-3.5 text-sm font-black shadow-[0_8px_28px_rgba(227,27,35,.25)] transition hover:-translate-y-0.5 hover:bg-red-700">Apply Now <ArrowRight size={16} className="ml-2 inline"/></a>
-            <a href="#courses" className="rounded-lg border border-white/60 bg-black/20 px-6 py-3.5 text-sm font-bold transition hover:border-red-500 hover:text-red-400">Explore Courses</a>
-            <a href="#about" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-white hover:text-red-400"><span className="grid h-10 w-10 place-items-center rounded-full border-2 border-white"><Play size={15} fill="currentColor"/></span> Discover Sterling</a>
+          <h1 className="max-w-[700px] text-[clamp(2.35rem,9vw,3.8rem)] font-black italic leading-[.98] tracking-tight sm:text-6xl lg:text-[72px]">BUILD YOUR FUTURE IN THE <span className="text-red-500">AUTOMOTIVE INDUSTRY</span></h1>
+          <p className="mt-5 max-w-xl text-[15px] leading-7 text-neutral-200 sm:mt-6 sm:text-lg">Develop practical technical skills, learn from industry professionals and build a successful career with Sterling.</p>
+          <div className="mt-7 flex flex-col items-stretch gap-3 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
+            <a href="#apply" className="flex min-h-[54px] items-center justify-center rounded-xl bg-[#e31b23] px-6 py-3.5 text-sm font-black shadow-[0_8px_28px_rgba(227,27,35,.25)] transition hover:-translate-y-0.5 hover:bg-red-700 min-[430px]:min-w-[165px]">Apply Now <ArrowRight size={16} className="ml-2 inline"/></a>
+            <a href="#courses" className="flex min-h-[54px] items-center justify-center rounded-xl border border-white/60 bg-black/25 px-6 py-3.5 text-sm font-bold backdrop-blur transition hover:border-red-500 hover:text-red-400 min-[430px]:min-w-[185px]">Explore Courses</a>
+            <a href="#about" className="flex min-h-[48px] items-center justify-center gap-2 px-2 py-2 text-xs font-bold text-white hover:text-red-400 min-[430px]:justify-start"><span className="grid h-10 w-10 place-items-center rounded-full border-2 border-white"><Play size={15} fill="currentColor"/></span> Discover Sterling</a>
           </div>
           <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-[10px] font-bold tracking-wide text-neutral-200 backdrop-blur"><ShieldCheck size={16} className="text-red-500"/> TVEC Approved Training Centre</div>
         </div>
@@ -140,8 +140,12 @@ export default function PremiumLanding(props: Props) {
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-600 to-transparent"/>
     </section>
 
-    <section aria-label="Training highlights" className="border-y border-white/10 bg-[#101316]">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-2 divide-x divide-white/10 px-4 py-5 sm:grid-cols-4 sm:px-7">{highlights.map(({icon:Icon,title,sub})=><div key={title} className="flex items-center gap-3 px-3 py-2 sm:justify-center"><Icon size={28} className="shrink-0 text-red-500"/><div><b className="block text-[11px] sm:text-sm">{title}</b><span className="mt-1 block text-[9px] text-neutral-400 sm:text-[11px]">{sub}</span></div></div>)}</div>
+    <section aria-label="Training highlights" className="relative border-y border-white/10 bg-[radial-gradient(ellipse_at_top,rgba(85,22,29,.22),transparent_60%),#090b0f] px-4 py-8 sm:px-7 sm:py-7">
+      <div className="mx-auto max-w-[1440px]">
+        <div className="mb-4 flex items-center justify-between sm:hidden"><div><p className="text-[9px] font-black uppercase tracking-[.28em] text-red-400">The Sterling advantage</p><h2 className="mt-1 text-lg font-extrabold">Built for your future</h2></div><span className="rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1 text-[9px] font-bold text-red-300">01 / 04</span></div>
+        <div className="grid grid-cols-2 gap-3 sm:hidden">{highlights.map(({icon:Icon,title,sub},i)=><article key={title} className="group relative min-h-[154px] overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#202128]/95 via-[#14171d]/95 to-[#180e13] p-4 shadow-[0_12px_30px_rgba(0,0,0,.24)] transition duration-300 active:scale-[.98]"><div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-red-600/10 blur-2xl transition group-hover:bg-red-500/20"/><div className="relative flex h-full flex-col"><div className="mb-3 flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl border border-red-400/20 bg-red-500/10 text-red-400"><Icon size={21}/></span><span className="text-[9px] font-black tracking-[.18em] text-white/25">0{i+1}</span></div><b className="text-[12px] font-extrabold leading-snug text-white">{title}</b><span className="mt-1.5 text-[10px] leading-4 text-neutral-400">{sub}</span></div><span className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-red-500/40 to-transparent"/></article>)}</div>
+        <div className="hidden grid-cols-2 divide-x divide-white/10 sm:grid sm:grid-cols-4">{highlights.map(({icon:Icon,title,sub})=><div key={title} className="flex items-center gap-3 px-3 py-2 sm:justify-center"><Icon size={28} className="shrink-0 text-red-500"/><div><b className="block text-[11px] sm:text-sm">{title}</b><span className="mt-1 block text-[9px] text-neutral-400 sm:text-[11px]">{sub}</span></div></div>)}</div>
+      </div>
     </section>
 
     <section id="courses" className="scroll-mt-24 bg-[radial-gradient(ellipse_at_top,#171b20_0%,#080a0c_65%)] px-4 py-16 sm:px-7 sm:py-20">
@@ -210,7 +214,7 @@ export default function PremiumLanding(props: Props) {
 
     <footer className="border-t border-red-900/60 bg-black px-4 pb-7 pt-12 sm:px-7"><div className="mx-auto grid max-w-[1440px] gap-9 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-block rounded bg-white p-2"><BrandLogo className="w-44"/></div><p className="mt-4 max-w-xs text-xs leading-6 text-neutral-400">Sterling Training Centre — practical technical training and learning support.</p></div><div><h3 className="text-xs font-black uppercase tracking-wider">Quick Links</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400">{nav.map(([label,href])=><a key={label} href={href} className="hover:text-red-400">{label}</a>)}</div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Student LMS</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><button onClick={props.onLogin} className="text-left hover:text-red-400">Student Login</button><a href="#courses" className="hover:text-red-400">Training Programmes</a><a href="#apply" className="hover:text-red-400">Apply Online</a><a href="#locations" className="hover:text-red-400">Training Locations</a></div></div><div><h3 className="text-xs font-black uppercase tracking-wider">Contact Us</h3><div className="mt-4 grid gap-3 text-xs text-neutral-400"><a href="tel:+94117600800">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk">callcenter@sterling.lk</a><a href="https://www.sterling.lk/" target="_blank" rel="noreferrer">www.sterling.lk</a><div className="flex gap-3 pt-1 text-white"></div></div></div></div><div className="mx-auto mt-10 max-w-[1440px] border-t border-white/10 pt-5 text-center text-[10px] text-neutral-500">© {new Date().getFullYear()} Sterling Training Centre. All rights reserved. · TVEC Approved Training Centre</div></footer>
 
-    <nav aria-label="Mobile quick navigation" className={'sterling-mobile-nav fixed bottom-3 left-1/2 z-[70] grid w-[92%] max-w-[560px] -translate-x-1/2 grid-cols-5 items-center px-2 py-2 sm:hidden '+(mobileNavScrolled?'is-scrolled':'')} style={{paddingBottom:'max(8px, env(safe-area-inset-bottom))'}}>
+    <nav aria-label="Mobile quick navigation" className={'sterling-mobile-nav fixed bottom-3 left-1/2 z-[70] grid w-[94%] max-w-[560px] -translate-x-1/2 grid-cols-5 items-center px-2 py-2 sm:hidden '+(mobileNavScrolled?'is-scrolled':'')} style={{paddingBottom:'max(8px, env(safe-area-inset-bottom))'}}>
       {[
         {label:'Home',href:'#home',icon:House},
         {label:'Courses',href:'#courses',icon:GraduationCap},
@@ -230,9 +234,10 @@ export default function PremiumLanding(props: Props) {
       .sterling-mobile-nav {
         isolation: isolate;
         overflow: hidden;
-        min-height: 94px;
+        min-height: 104px;
         border: 1px solid rgba(190,198,220,.2);
-        border-radius: 32px;
+        border-radius: 30px;
+        transition: width .38s cubic-bezier(.2,.8,.2,1), min-height .38s cubic-bezier(.2,.8,.2,1), padding .38s ease, border-radius .38s ease, background .35s ease, box-shadow .35s ease, border-color .35s ease;
         background: linear-gradient(125deg, rgba(13,17,31,.88), rgba(10,14,27,.82) 55%, rgba(20,19,42,.86));
         box-shadow: 0 14px 42px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.09);
         -webkit-backdrop-filter: blur(30px) saturate(180%);
@@ -249,11 +254,18 @@ export default function PremiumLanding(props: Props) {
         background: linear-gradient(110deg, rgba(255,255,255,.055), transparent 38%, rgba(130,110,255,.07));
       }
       .sterling-mobile-nav.is-scrolled {
+        width: 78%;
+        max-width: 430px;
+        min-height: 68px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-radius: 24px;
         border-color: rgba(205,210,235,.28);
         background: linear-gradient(125deg, rgba(13,17,31,.82), rgba(10,14,27,.76) 55%, rgba(24,20,48,.82));
         box-shadow: 0 17px 48px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.12);
       }
-      .sterling-nav-item { position: relative; -webkit-tap-highlight-color: transparent; }
+      .sterling-nav-item { position: relative; min-height: 86px; -webkit-tap-highlight-color: transparent; transition: min-height .38s ease, padding .38s ease, background .3s ease, color .3s ease; }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-item { min-height: 56px; padding-top: 5px; padding-bottom: 5px; border-radius: 17px; }
       .sterling-nav-icon {
         display: inline-flex;
         align-items: center;
@@ -271,10 +283,12 @@ export default function PremiumLanding(props: Props) {
         transform: scale(1.12);
         filter: drop-shadow(0 0 8px rgba(160,140,255,.35));
       }
-      .sterling-mobile-nav.is-scrolled .sterling-nav-item:not(.is-selected) .sterling-nav-icon { transform: scale(1.07); }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-icon { transform: scale(.78); }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-item.is-selected .sterling-nav-icon { transform: scale(.9); }
+      .sterling-mobile-nav.is-scrolled .sterling-nav-label { font-size: 9px; line-height: 1; }
       .sterling-nav-item:active .sterling-nav-icon { transform: scale(.84) !important; }
       @media (prefers-reduced-motion: reduce) {
-        .sterling-mobile-nav, .sterling-nav-icon, .sterling-nav-label { transition: none !important; }
+        .sterling-mobile-nav, .sterling-nav-item, .sterling-nav-icon, .sterling-nav-label { transition: none !important; }
       }
 
       .sterling-premium section { scroll-margin-top: 88px; }
