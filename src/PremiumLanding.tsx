@@ -250,7 +250,7 @@ export default function PremiumLanding(props: Props) {
         inset: 0;
         pointer-events: none;
         border-radius: inherit;
-        background: linear-gradient(110deg, rgba(255,255,255,.055), transparent 38%, rgba(130,110,255,.07));
+        background: linear-gradient(110deg, rgba(255,255,255,.055), transparent 38%, rgba(225,29,45,.09));
       }
       .sterling-mobile-nav.is-scrolled {
         width: 78%;
@@ -275,12 +275,12 @@ export default function PremiumLanding(props: Props) {
         filter: drop-shadow(0 2px 5px rgba(0,0,0,.28));
       }
       .sterling-nav-item.is-selected {
-        background: linear-gradient(145deg, rgba(100,75,220,.34), rgba(76,58,171,.28));
-        box-shadow: inset 0 0 0 1px rgba(157,139,255,.2), 0 5px 18px rgba(54,39,145,.16);
+        background: linear-gradient(145deg, rgba(190,24,42,.38), rgba(105,15,28,.32));
+        box-shadow: inset 0 0 0 1px rgba(255,105,105,.24), 0 5px 18px rgba(150,18,32,.2);
       }
       .sterling-nav-item.is-selected .sterling-nav-icon {
         transform: scale(1.12);
-        filter: drop-shadow(0 0 8px rgba(160,140,255,.35));
+        filter: drop-shadow(0 0 8px rgba(255,75,75,.42));
       }
       .sterling-mobile-nav.is-scrolled .sterling-nav-icon { transform: scale(.78); }
       .sterling-mobile-nav.is-scrolled .sterling-nav-item.is-selected .sterling-nav-icon { transform: scale(.9); }
