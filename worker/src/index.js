@@ -52,7 +52,7 @@ export default {async fetch(req,env){
   const [salt,digest]=u.password_hash.split(":");if(!salt||await pwHash(password,salt)!==digest)return json({error:"Invalid email or password"},401,h);
   const token=hex(random(32).buffer),expires=new Date(Date.now()+604800000).toISOString();
   await env.DB.prepare("INSERT INTO sessions(id,user_id,token_hash,expires_at) VALUES(?,?,?,?)").bind(crypto.randomUUID(),u.id,await hash(token),expires).run();
-  return json({user:{id:u.id,email:u.email,full_name:u.full_name,role:u.role},token},200,{...h,"set-cookie":cookie(token,604800,u.role)});
+  const ap=u.role==="admin"?await env.DB.prepare("SELECT permissions FROM admin_permissions WHERE user_id=?").bind(u.id).first():null;let permissions=null;try{if(ap)permissions=JSON.parse(ap.permissions)}catch{}return json({user:{id:u.id,email:u.email,full_name:u.full_name,role:u.role,permissions},token},200,{...h,"set-cookie":cookie(token,604800,u.role)});
  }
  if(path==="/auth/me"&&req.method==="GET"){const role=new URL(req.url).searchParams.get("role")==="admin"?"admin":"student";const u=await userFor(req,env,role);return u?json({user:u},200,h):json({error:"Sign in required"},401,h);}
  if(path==="/auth/logout"&&req.method==="POST"){const role=new URL(req.url).searchParams.get("role")==="admin"?"admin":"student";const name=role==="admin"?"sterling_admin_session":"sterling_student_session";const t=req.headers.get("Authorization")?.match(/^Bearer\\s+(.+)$/i)?.[1]||req.headers.get("Cookie")?.match(new RegExp("(?:^|; )"+name+"=([^;]+)"))?.[1];if(t)await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await hash(t)).run();return json({ok:true},200,{...h,"set-cookie":cookie("",0,role)});}
