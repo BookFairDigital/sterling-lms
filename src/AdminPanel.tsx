@@ -196,7 +196,7 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
   }
 
   const exportRows = () => {
-    const fields=columns[section as Exclude<Section,'overview'|'reports'>]||[]
+    const fields=columns[section as Exclude<Section,'overview'|'reports'|'admins'>]||[]
     const csv=[fields.map(x=>labels[x]||x).join(','),...visibleRows.map(row=>fields.map(k=>'"'+String(row[k]??'').replace(/"/g,'""')+'"').join(','))].join('\r\n')
     const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download='sterling-'+section+'-'+new Date().toISOString().slice(0,10)+'.csv';link.click();URL.revokeObjectURL(url)
   }
