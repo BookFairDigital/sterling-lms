@@ -41,7 +41,7 @@ function AssessmentCreator({onCreated,authToken}:{onCreated:()=>void;authToken:s
 function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions = null }: { onExit: () => void; role?: string; authToken?: string; adminPermissions?: string[] | null }) {
   const fetchWithAuth = (input: RequestInfo | URL, init: RequestInit = {}) => apiFetch(input, init, authToken)
   const visibleSections=role==='lecturer'?sections.filter(x=>x.id==='attendance'||x.id==='overview'):adminPermissions===null?sections:sections.filter(x=>adminPermissions.includes(x.id))
-  const [section, setSection] = useState<Section>(role==='lecturer'?'attendance':'overview')
+  const [section, setSection] = useState<Section>(role==='lecturer'?'attendance':adminPermissions===null?'overview':(sections.find(x=>adminPermissions.includes(x.id))?.id||'overview'))
   const [dashboard, setDashboard] = useState<Record<string, number> | null>(null)
   const [reportData, setReportData] = useState<any>(null)
   const [rows, setRows] = useState<DataRow[]>([])
