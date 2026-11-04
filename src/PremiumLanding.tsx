@@ -242,7 +242,6 @@ export default function PremiumLanding(props: Props) {
         box-shadow: 0 14px 42px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.09);
         -webkit-backdrop-filter: blur(30px) saturate(180%);
         backdrop-filter: blur(30px) saturate(180%);
-        transition: background .35s ease, box-shadow .35s ease, border-color .35s ease;
       }
       .sterling-mobile-nav::before {
         content: "";
