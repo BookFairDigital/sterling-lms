@@ -84,7 +84,7 @@ export default function PremiumLanding(props: Props) {
     ['Locations', '#locations'], ['Contact', '#contact'],
   ]
   const highlights = [
-    { icon: Award, title: 'TVEC Approved', sub: 'Registered Training Centre' },
+    { icon: Award, title: 'TVEC Approved', sub: 'Registered Training Centre · P02/0426' },
     { icon: Users, title: 'Industry Trainers', sub: 'Experienced Professionals' },
     { icon: Wrench, title: 'Hands-on Training', sub: 'Real Workshop Experience' },
     { icon: BriefcaseBusiness, title: 'Career Pathways', sub: 'Skills for the workplace' },
@@ -97,16 +97,16 @@ export default function PremiumLanding(props: Props) {
   ]
 
   return <main className="sterling-premium min-h-screen overflow-hidden bg-[#080a0c] pb-24 text-white sm:pb-0">
-    <div className="border-b border-white/10 bg-black/90 text-[10px] text-neutral-300">
-      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-7">
+    <div className="border-b border-white/10 bg-black/90 text-xs text-neutral-300">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-2.5 sm:px-7">
         <span className="font-semibold tracking-[.16em]">TVEC APPROVED TRAINING CENTRE · REF. P02/0426</span>
-        <div className="flex gap-4"><a href="tel:+94117600800" className="hover:text-blue-400">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="hover:text-blue-400">callcenter@sterling.lk</a></div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-semibold"><a href="tel:+94117600800" className="hover:text-blue-400">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="hover:text-blue-400">callcenter@sterling.lk</a><a href="tel:+94762259595" className="hover:text-blue-400">076 225 9595</a><a href="mailto:info@sats.lk" className="hover:text-blue-400">Info@sats.lk</a></div>
       </div>
     </div>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#080a0c]/95 shadow-lg shadow-black/20 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-7">
         <a href="#home" aria-label="Sterling LMS home" className="shrink-0 rounded bg-white px-2 py-1"><BrandLogo className="w-36 sm:w-44"/></a>
-        <nav className="hidden items-center gap-5 xl:flex">{nav.map(([label, href], i)=><a key={label} href={href} className={`text-[12px] font-bold transition hover:text-blue-500 ${i===0?'text-blue-500':''}`}>{label}</a>)}</nav>
+        <nav className="hidden items-center gap-5 xl:flex">{nav.map(([label, href], i)=><a key={label} href={href} className={`text-sm font-bold transition hover:text-blue-500 ${i===0?'text-blue-500':''}`}>{label}</a>)}</nav>
         <div className="hidden items-center gap-2 sm:flex">
           <button onClick={props.onLogin} className="rounded-lg border border-white/40 px-4 py-2.5 text-[11px] font-bold transition hover:border-blue-500 hover:text-blue-400"><Users size={14} className="mr-1.5 inline"/>Student Login</button>
           <a href="#apply" className="rounded-lg bg-[#1749d1] px-4 py-2.5 text-[11px] font-black text-white shadow-lg shadow-blue-950/40 transition hover:bg-blue-700"><GraduationCap size={15} className="mr-1 inline"/>Apply Now</a>
@@ -125,13 +125,13 @@ export default function PremiumLanding(props: Props) {
       
       <div className="relative z-20 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-5 py-16 sm:px-10 sm:py-20 lg:grid-cols-[.95fr_1.05fr]">
         <div className="max-w-[690px]">
-          <p className="mb-5 text-[10px] font-black uppercase tracking-[.35em] text-blue-400 sm:text-xs">Sterling Automobiles Training School</p>
+          <p className="mb-5 text-sm font-black uppercase tracking-[.28em] text-blue-400 sm:text-base">Sterling Automobiles Training School</p>
           <h1 className="max-w-[700px] text-[clamp(2.35rem,9vw,3.8rem)] font-black italic leading-[.98] tracking-tight sm:text-6xl lg:text-[72px]">BUILD YOUR FUTURE IN THE <span className="text-blue-500">AUTOMOTIVE INDUSTRY</span></h1>
-          <p className="mt-5 max-w-xl text-[15px] leading-7 text-neutral-200 sm:mt-6 sm:text-lg">Develop practical technical skills, learn from industry professionals and build a successful career with Sterling.</p>
+          <p className="mt-5 max-w-xl text-base leading-8 text-neutral-200 sm:mt-6 sm:text-xl">Develop practical technical skills, learn from industry professionals and build a successful career with SATS.</p>
           <div className="mt-7 flex flex-col items-stretch gap-3 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
             <a href="#apply" className="flex min-h-[54px] items-center justify-center rounded-xl bg-[#1749d1] px-6 py-3.5 text-sm font-black shadow-[0_8px_28px_rgba(227,27,35,.25)] transition hover:-translate-y-0.5 hover:bg-blue-700 min-[430px]:min-w-[165px]">Apply Now <ArrowRight size={16} className="ml-2 inline"/></a>
             <a href="#courses" className="flex min-h-[54px] items-center justify-center rounded-xl border border-white/60 bg-black/25 px-6 py-3.5 text-sm font-bold backdrop-blur transition hover:border-blue-500 hover:text-blue-400 min-[430px]:min-w-[185px]">Explore Courses</a>
-            <a href="#about" className="flex min-h-[48px] items-center justify-center gap-2 px-2 py-2 text-xs font-bold text-white hover:text-blue-400 min-[430px]:justify-start"><span className="grid h-10 w-10 place-items-center rounded-full border-2 border-white"><Play size={15} fill="currentColor"/></span> Discover Sterling</a>
+            <a href="#about" className="flex min-h-[48px] items-center justify-center gap-2 px-2 py-2 text-xs font-bold text-white hover:text-blue-400 min-[430px]:justify-start"><span className="grid h-10 w-10 place-items-center rounded-full border-2 border-white"><Play size={15} fill="currentColor"/></span> Discover SATS</a>
           </div>
           <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-[10px] font-bold tracking-wide text-neutral-200 backdrop-blur"><ShieldCheck size={16} className="text-blue-500"/> TVEC Approved Training Centre</div>
         </div>
@@ -144,7 +144,7 @@ export default function PremiumLanding(props: Props) {
       <div className="mx-auto max-w-[1440px]">
         <div className="mb-4 flex items-center justify-between sm:hidden"><div><p className="text-[9px] font-black uppercase tracking-[.28em] text-blue-400">The Sterling advantage</p><h2 className="mt-1 text-lg font-extrabold">Built for your future</h2></div><span className="rounded-full border border-blue-500/25 bg-blue-500/10 px-3 py-1 text-[9px] font-bold text-blue-300">01 / 04</span></div>
         <div className="grid grid-cols-2 gap-3 sm:hidden">{highlights.map(({icon:Icon,title,sub},i)=><article key={title} className="group relative min-h-[154px] overflow-hidden rounded-[20px] border border-white/10 bg-gradient-to-br from-[#202128]/95 via-[#14171d]/95 to-[#180e13] p-4 shadow-[0_12px_30px_rgba(0,0,0,.24)] transition duration-300 active:scale-[.98]"><div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-blue-600/10 blur-2xl transition group-hover:bg-blue-500/20"/><div className="relative flex h-full flex-col"><div className="mb-3 flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-400"><Icon size={21}/></span><span className="text-[9px] font-black tracking-[.18em] text-white/25">0{i+1}</span></div><b className="text-[12px] font-extrabold leading-snug text-white">{title}</b><span className="mt-1.5 text-[10px] leading-4 text-neutral-400">{sub}</span></div><span className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent"/></article>)}</div>
-        <div className="hidden grid-cols-2 divide-x divide-white/10 sm:grid sm:grid-cols-4">{highlights.map(({icon:Icon,title,sub})=><div key={title} className="flex items-center gap-3 px-3 py-2 sm:justify-center"><Icon size={28} className="shrink-0 text-blue-500"/><div><b className="block text-[11px] sm:text-sm">{title}</b><span className="mt-1 block text-[9px] text-neutral-400 sm:text-[11px]">{sub}</span></div></div>)}</div>
+        <div className="hidden grid-cols-2 divide-x divide-white/10 sm:grid sm:grid-cols-4">{highlights.map(({icon:Icon,title,sub})=><div key={title} className="flex items-center gap-3 px-3 py-2 sm:justify-center"><Icon size={28} className="shrink-0 text-blue-500"/><div><b className="block text-sm sm:text-base">{title}</b><span className="mt-1 block text-xs text-neutral-400 sm:text-sm">{sub}</span></div></div>)}</div>
       </div>
     </section>
 
