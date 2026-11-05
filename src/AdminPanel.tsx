@@ -94,6 +94,7 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
   const [adminEdits,setAdminEdits]=useState<Record<string,{full_name:string;email:string;password:string}>>({})
   const [editingAdmins,setEditingAdmins]=useState<string[]>([])
   const [savingAdmin,setSavingAdmin]=useState(false)
+  const [mobileMoreOpen,setMobileMoreOpen]=useState(false)
 
   const title = (role==='lecturer'?'Lecturer · ':'')+(sections.find(x => x.id === section)?.label || 'Overview')
   const load = useCallback(async (target: Section = section) => {
@@ -256,10 +257,16 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
   }
   const labels: Record<string, string> = { due_at:'Due date',submission_count:'Submissions', student_number: 'Student ID', student_name: 'Student', course_title: 'Course', course_code: 'Course Code', file_type: 'File type', file_size: 'Size (bytes)', full_name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', title: 'Title', fee_amount: 'Fee', currency: 'Currency', id: 'Payment ID', amount: 'Amount', starts_at: 'Starts', duration_minutes: 'Duration (min)', meeting_url: 'Meeting link', body: 'Message', audience: 'Audience', published_at: 'Published', created_at: 'Created',course_type:'Course type',qualification:'Qualification',duration_months:'Duration (months)',start_month:'Start month',end_month:'End month',max_score:'Maximum score',score:'Score',assessment_type:'Assessment type',category:'Category',message:'Message' }
   return <div className="sterling-admin min-h-screen bg-[#f7f7f7] text-[#202a34]">
-    <aside className="fixed inset-y-0 left-0 hidden w-[245px] flex-col bg-[#202a34] text-white lg:flex"><div className="flex h-20 items-center border-b border-white/10 px-4"><BrandLogo className="max-w-[175px] rounded bg-white p-1"/></div><nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">{visibleSections.map(item => <button key={item.id} onClick={() => setSection(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[13px] ${section === item.id ? 'bg-blue-600' : 'text-blue-100 hover:bg-white/10'}`}><item.icon size={17}/>{item.label}</button>)}</nav><button onClick={onExit} className="flex items-center gap-3 border-t border-white/10 p-5 text-sm text-blue-100"><LogOut size={16}/>Sign out</button></aside>
-    <main className="min-h-screen lg:ml-[245px]"><header className="flex min-h-[76px] items-center justify-between gap-3 border-b bg-white px-4 py-2 sm:px-6"><BrandLogo className="w-[125px]"/><b className="ml-auto mr-3 text-sm">Sterling LMS · Admin</b><button onClick={() => void load(section)} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50"><RefreshCw size={14} className={loading ? 'animate-spin' : ''}/>Refresh</button></header>
-      <div className="mx-auto max-w-[1500px] p-4 sm:p-6"><div className="mb-6"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-blue-600">Live database</p><h1 className="mt-1 text-2xl font-extrabold">{title}</h1><p className="mt-1 text-xs text-slate-500">Records are loaded from Sterling LMS D1 database.</p></div>
-      <div className="mb-4 flex flex-wrap gap-2 lg:hidden">{visibleSections.map(item => <button key={item.id} onClick={() => setSection(item.id)} className={`rounded-lg px-3 py-2 text-xs font-semibold ${section === item.id ? 'bg-blue-600 text-white' : 'bg-white'}`}>{item.label}</button>)}<button onClick={onExit} className="rounded-lg bg-white px-3 py-2 text-xs">Sign out</button></div>
+    <aside className="fixed inset-y-0 left-0 hidden w-[255px] flex-col border-r border-white/10 bg-[#090a0d] text-white shadow-[12px_0_40px_rgba(0,0,0,.25)] lg:flex"><div className="flex h-20 items-center border-b border-white/10 bg-gradient-to-r from-[#17090c] to-[#090a0d] px-4"><BrandLogo className="max-w-[175px] rounded bg-white p-1"/></div><nav className="min-h-0 flex-1 space-y-1 overflow-y-auto p-3">{visibleSections.map(item => <button key={item.id} onClick={() => setSection(item.id)} className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-[13px] ${section === item.id ? 'bg-gradient-to-r from-red-700 to-red-600 text-white shadow-lg shadow-red-950/40' : 'text-slate-300 hover:bg-white/[.06] hover:text-white'}`}><item.icon size={17}/>{item.label}</button>)}</nav><button onClick={onExit} className="flex items-center gap-3 border-t border-white/10 p-5 text-sm text-blue-100"><LogOut size={16}/>Sign out</button></aside>
+    <main className="min-h-screen bg-[#0b0c0f] lg:ml-[255px]"><header className="sticky top-0 z-20 flex min-h-[76px] items-center justify-between gap-3 border-b border-white/10 bg-[#0b0c0f]/90 px-4 py-2 text-white shadow-lg shadow-black/20 backdrop-blur-xl sm:px-6"><BrandLogo className="w-[125px]"/><b className="ml-auto mr-3 text-sm">Sterling LMS · Admin</b><button onClick={() => void load(section)} disabled={loading} className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold disabled:opacity-50"><RefreshCw size={14} className={loading ? 'animate-spin' : ''}/>Refresh</button></header>
+      <div className="mx-auto max-w-[1500px] px-3 pb-28 pt-4 sm:p-6 sm:pb-28"><div className="mb-6 rounded-2xl border border-white/10 bg-gradient-to-r from-[#17191f] via-[#101115] to-[#25090d] p-4 shadow-[0_12px_40px_rgba(0,0,0,.25)] sm:p-6"><p className="text-[10px] font-bold uppercase tracking-[.18em] text-red-400">Live database</p><h1 className="mt-1 text-2xl font-extrabold">{title}</h1><p className="mt-1 text-xs text-slate-500">Records are loaded from Sterling LMS D1 database.</p></div>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#090a0d]/95 px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-2 shadow-[0_-12px_35px_rgba(0,0,0,.5)] backdrop-blur-xl lg:hidden">
+        {mobileMoreOpen && <div className="absolute bottom-full left-3 right-3 mb-3 max-h-[55vh] overflow-y-auto rounded-2xl border border-white/10 bg-[#17191f]/95 p-3 shadow-2xl backdrop-blur-xl"><div className="mb-2 flex items-center justify-between"><span className="text-[10px] font-bold uppercase tracking-[.18em] text-red-400">All sections</span><button onClick={()=>setMobileMoreOpen(false)} className="rounded-lg px-2 py-1 text-xs text-slate-300">Close</button></div><div className="grid grid-cols-2 gap-2">{visibleSections.map(item=><button key={item.id} onClick={()=>{setSection(item.id);setMobileMoreOpen(false)}} className={`flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 text-left text-[11px] font-semibold ${section===item.id?'border-red-500/50 bg-red-600/20 text-white':'border-white/10 bg-white/[.04] text-slate-300'}`}><item.icon size={15}/>{item.label}</button>)}</div><button onClick={onExit} className="mt-3 flex w-full items-center gap-2 rounded-xl border border-white/10 px-3 py-2.5 text-xs font-semibold text-slate-300"><LogOut size={15}/>Sign out</button></div>}
+        <div className="grid grid-cols-4 gap-1">
+          {[{id:'overview' as Section,label:'Dashboard',icon:LayoutDashboard},{id:'reports' as Section,label:'Reports',icon:FileBarChart},{id:'announcements' as Section,label:'Announcements',icon:Bell}].map(item=>{const Icon=item.icon;const allowed=visibleSections.some(x=>x.id===item.id);return <button key={item.id} disabled={!allowed} onClick={()=>setSection(item.id)} className={`flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-xl text-[9px] font-semibold transition ${section===item.id?'bg-red-600 text-white shadow-lg shadow-red-950/50':'text-slate-400'} disabled:opacity-30`}><Icon size={18}/>{item.label}</button>})}
+          <button onClick={()=>setMobileMoreOpen(v=>!v)} className={`flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-xl text-[9px] font-semibold ${mobileMoreOpen?'bg-red-600 text-white':'text-slate-400'}`}><ShieldCheck size={18}/>{mobileMoreOpen?'Close':'More'}</button>
+        </div>
+      </div>
       {error && <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       {section === 'admins' ? <div className="space-y-5">
         <section className="rounded-2xl border bg-white p-5 shadow-sm">
@@ -407,6 +414,34 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
           </div>}
         </div>}
       </section></>}
+      <style>{`
+        .sterling-admin { background:#0b0c0f !important; color:#f4f4f5 !important; color-scheme:dark; }
+        .sterling-admin main { background:radial-gradient(ellipse at 88% 0%,rgba(150,12,30,.16),transparent 34%),#0b0c0f; }
+        .sterling-admin .bg-white { background-color:#15171c !important; color:#f4f4f5; }
+        .sterling-admin .bg-slate-50 { background-color:#1b1d23 !important; color:#e5e7eb; }
+        .sterling-admin .bg-slate-100 { background-color:#24262d !important; }
+        .sterling-admin .border, .sterling-admin .border-t, .sterling-admin .border-b, .sterling-admin .border-slate-100, .sterling-admin .border-slate-200, .sterling-admin .border-slate-200\\/80, .sterling-admin .border-slate-300 { border-color:rgba(255,255,255,.10) !important; }
+        .sterling-admin .text-slate-900 { color:#fff !important; }
+        .sterling-admin .text-slate-700, .sterling-admin .text-slate-600, .sterling-admin .text-slate-500 { color:#a7aab4 !important; }
+        .sterling-admin .text-slate-400 { color:#858995 !important; }
+        .sterling-admin .text-blue-600, .sterling-admin .text-blue-700, .sterling-admin .text-blue-800 { color:#ff5a66 !important; }
+        .sterling-admin .bg-blue-600, .sterling-admin .hover\\:bg-blue-700:hover { background:#c9142b !important; color:#fff !important; }
+        .sterling-admin .bg-blue-50, .sterling-admin .bg-blue-100 { background:rgba(201,20,43,.15) !important; color:#ff7a84 !important; }
+        .sterling-admin .border-blue-200 { border-color:rgba(255,75,90,.28) !important; }
+        .sterling-admin input:not([type=checkbox]):not([type=radio]), .sterling-admin select, .sterling-admin textarea { background:#101216 !important; color:#f4f4f5 !important; border-color:rgba(255,255,255,.14) !important; }
+        .sterling-admin input::placeholder, .sterling-admin textarea::placeholder { color:#777b86 !important; }
+        .sterling-admin input:focus, .sterling-admin select:focus, .sterling-admin textarea:focus { outline:none; border-color:#e11d36 !important; box-shadow:0 0 0 3px rgba(225,29,54,.13); }
+        .sterling-admin input[type=checkbox] { accent-color:#e11d36; }
+        .sterling-admin table thead { background:#1b1d23 !important; color:#a7aab4 !important; }
+        .sterling-admin tbody tr:hover { background:rgba(255,255,255,.025); }
+        .sterling-admin button { transition:background-color .2s ease,border-color .2s ease,transform .2s ease; }
+        .sterling-admin button:focus-visible { outline:2px solid #f04455; outline-offset:2px; }
+        .sterling-admin .shadow-sm { box-shadow:0 8px 28px rgba(0,0,0,.22) !important; }
+        .sterling-admin .rounded-2xl { border-radius:18px; }
+        @media(min-width:1024px){.sterling-admin main>header{padding-left:30px;padding-right:30px}.sterling-admin main>.mx-auto{padding-top:28px}}
+        @media(max-width:639px){.sterling-admin h1{font-size:1.45rem}.sterling-admin .rounded-2xl{border-radius:16px}.sterling-admin main>.mx-auto{padding-left:12px;padding-right:12px}.sterling-admin label{line-height:1.5}}
+        @media(prefers-reduced-motion:reduce){.sterling-admin *{transition:none!important;scroll-behavior:auto!important}}
+      `}</style>
       <footer className="py-7 text-center text-[10px] text-slate-400">Sterling Training Centre · Administration</footer></div></main></div>
 }
 export default AdminPanel
