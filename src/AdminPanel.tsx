@@ -442,6 +442,6 @@ function AdminPanel({ onExit, role = 'admin', authToken = '', adminPermissions =
         @media(max-width:639px){.sterling-admin h1{font-size:1.45rem}.sterling-admin .rounded-2xl{border-radius:16px}.sterling-admin main>.mx-auto{padding-left:12px;padding-right:12px}.sterling-admin label{line-height:1.5}}
         @media(prefers-reduced-motion:reduce){.sterling-admin *{transition:none!important;scroll-behavior:auto!important}}
       `}</style>
-      <footer className="py-7 text-center text-[10px] text-slate-400">Sterling Training Centre · Administration</footer></div></main></div>
+      <footer className="py-7 text-center text-[10px] text-slate-400">Sterling Automobiles Training School · Administration</footer></div></main></div>
 }
 export default AdminPanel
