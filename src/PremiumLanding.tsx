@@ -3,7 +3,7 @@ import BrandLogo from './BrandLogo'
 import {
   ArrowRight, Award, BookOpen, BriefcaseBusiness, CheckCircle2,
   GraduationCap, MapPin, Menu, Monitor, Phone, Play, Settings, House, FilePenLine, UserRound, LockKeyhole,
-  ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck,
+  ShieldCheck, Users, Wrench, X, Mail, Clock3, BadgeCheck, MessageCircle,
 } from 'lucide-react'
 
 type Course = {
@@ -100,7 +100,7 @@ export default function PremiumLanding(props: Props) {
     <div className="border-b border-white/10 bg-black/90 text-xs text-neutral-300">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-2 px-4 py-2.5 sm:px-7">
         <span className="font-semibold tracking-[.16em]">TVEC APPROVED TRAINING CENTRE · REF. P02/0426</span>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-semibold"><a href="tel:+94117600800" className="hover:text-blue-400">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="hover:text-blue-400">callcenter@sterling.lk</a><a href="tel:+94762259595" className="hover:text-blue-400">076 225 9595</a><a href="mailto:info@sats.lk" className="hover:text-blue-400">Info@sats.lk</a></div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-semibold"><a href="tel:+94117600800" className="hover:text-blue-400">+94 11 760 0800</a><a href="mailto:callcenter@sterling.lk" className="hover:text-blue-400">callcenter@sterling.lk</a><a href="tel:+94762259595" className="hover:text-blue-400">076 225 9595</a><a href="mailto:info@sats.lk" className="hover:text-blue-400">Info@sats.lk</a><a href="https://wa.me/94762259595?text=Hello%20SATS" target="_blank" rel="noreferrer" aria-label="Chat with SATS on WhatsApp" className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-3.5 py-1.5 font-extrabold text-[#062b16] shadow-md shadow-green-950/30 transition hover:-translate-y-0.5 hover:bg-[#42e47c]"><MessageCircle size={15} strokeWidth={2.5}/> WhatsApp · 076 225 9595</a></div>
       </div>
     </div>
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#080a0c]/95 shadow-lg shadow-black/20 backdrop-blur-xl">
