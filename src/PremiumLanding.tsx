@@ -106,7 +106,7 @@ export default function PremiumLanding(props: Props) {
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#080a0c]/95 shadow-lg shadow-black/20 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-7">
         <a href="#home" aria-label="Sterling LMS home" className="shrink-0 rounded bg-white px-2 py-1"><BrandLogo className="w-36 sm:w-44"/></a>
-        <nav className="hidden items-center gap-5 xl:flex">{nav.map(([label, href], i)=><a key={label} href={href} className={`text-sm font-bold transition hover:text-blue-500 ${i===0?'text-blue-500':''}`}>{label}</a>)}</nav>
+        <nav className="hidden items-center gap-4 2xl:gap-5 xl:flex">{nav.map(([label, href], i)=><a key={label} href={href} className={`whitespace-nowrap text-base font-bold transition hover:text-blue-500 ${i===0?'text-blue-500':''}`}>{label}</a>)}</nav>
         <div className="hidden items-center gap-2 sm:flex">
           <button onClick={props.onLogin} className="rounded-lg border border-white/40 px-4 py-2.5 text-[11px] font-bold transition hover:border-blue-500 hover:text-blue-400"><Users size={14} className="mr-1.5 inline"/>Student Login</button>
           <a href="#apply" className="rounded-lg bg-[#1749d1] px-4 py-2.5 text-[11px] font-black text-white shadow-lg shadow-blue-950/40 transition hover:bg-blue-700"><GraduationCap size={15} className="mr-1 inline"/>Apply Now</a>
@@ -125,7 +125,7 @@ export default function PremiumLanding(props: Props) {
       
       <div className="relative z-20 mx-auto grid w-full max-w-[1440px] items-center gap-8 px-5 py-16 sm:px-10 sm:py-20 lg:grid-cols-[.95fr_1.05fr]">
         <div className="max-w-[690px]">
-          <p className="mb-5 text-sm font-black uppercase tracking-[.28em] text-blue-400 sm:text-base">Sterling Automobiles Training School</p>
+          <p className="mb-5 text-base font-black uppercase tracking-[.24em] text-blue-400 sm:text-xl">Sterling Automobiles Training School</p>
           <h1 className="max-w-[700px] text-[clamp(2.35rem,9vw,3.8rem)] font-black italic leading-[.98] tracking-tight sm:text-6xl lg:text-[72px]">BUILD YOUR FUTURE IN THE <span className="text-blue-500">AUTOMOTIVE INDUSTRY</span></h1>
           <p className="mt-5 max-w-xl text-base leading-8 text-neutral-200 sm:mt-6 sm:text-xl">Develop practical technical skills, learn from industry professionals and build a successful career with SATS.</p>
           <div className="mt-7 flex flex-col items-stretch gap-3 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
